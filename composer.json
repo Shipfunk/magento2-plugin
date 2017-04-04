@@ -1,0 +1,25 @@
+{
+    "name": "shipfunk/magento2-plugin",
+    "description": "Shipfunk shipping method",
+    "require": {
+        "php": "~5.6.0|7.0.2|~7.0.6",
+        "magento/module-sales": "100.*",
+        "dvdoug/boxpacker": "2.0.2",
+        "rmccue/requests": "^1.7", 
+        "shipfunk/magento2-plugin"
+    },
+    "type": "magento2-module",
+    "version": "dev-master",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Nord\\Shipfunk\\": "dev-master"
+        }
+    }
+}

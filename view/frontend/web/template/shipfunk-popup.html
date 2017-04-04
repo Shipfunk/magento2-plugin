@@ -1,0 +1,33 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+ -->
+
+<div class="block-shipfunk"
+     data-bind="afterRender: setModalElement, blockLoader: isLoading"
+     style="display: none">
+    <div class="block block-shipfunk-option"
+         data-bind="attr: {'data-label': $t('or')}">
+        <div class="block-title">
+            <strong id="block-shipfunk-option-heading"
+                    role="heading"
+                    aria-level="2"
+                    data-bind="i18n: shippingPoints ? 'Choose pickup location' : ''"></strong>
+        </div>
+        <div class="block-content" aria-labelledby="block-shipfunk-option-heading">
+            <div table data-bind="if: shippingPoints">
+                <div class="points" data-bind="foreach: shippingPoints">
+                    <div data-bind="attr: {
+                                             'id': 's_method_' + pickup_id,
+                                          },
+                                          css: $parent.selectedPickup() == pickup_id ? 'selected' : '',
+                                          click: $parent.selectPickupPoint,
+                                          text: pickup_name + ': ' + pickup_addr + ', ' + pickup_postal + ', ' + pickup_city + ', ' + pickup_country">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

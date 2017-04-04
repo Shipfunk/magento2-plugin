@@ -1,0 +1,57 @@
+.checkout-shipping-method .step-title {
+    border: none;
+}
+
+.catHeader {
+    font-weight: bold;
+    font-size: 18px;
+    color: #bbb;
+    border: none;
+}
+
+#shipfunkPickup {
+    margin-bottom: 15px;
+}
+
+div#tooltip a span {
+    display: none;
+}
+
+div#tooltip a:hover span {
+    display: block;
+    position: relative;
+    padding: 5px;
+    margin: 10px;
+    z-index: 100;
+    color: black;
+    background-color: #FFFFFF;
+    border: 1px solid #ccc;
+    font-size: 11px;
+    max-width: 300px;
+    min-width: 200px;
+    word-wrap: break-word;
+}
+
+div#tooltip a {
+    position: relative;
+}
+
+div#tooltip a span {
+    display: none;
+}
+
+div#tooltip a:hover span {
+    display: block;
+    position: absolute;
+    color: black;
+    background-color: #FFFFFF;
+    border: 1px solid #ccc;
+    font-size: 11px;
+    max-width: 300px;
+    min-width: 200px;
+    word-wrap: break-word;
+}
+
+div#tooltip a:hover {
+    text-indent: 0;
+}

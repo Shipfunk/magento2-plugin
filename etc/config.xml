@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Nord Software
+ * @package Nord_Shipfunk
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carriers>
+            <shipfunk>
+                <active>1</active>
+                <is_online>1</is_online>
+                <model>Nord\Shipfunk\Model\Carrier\Shipfunk</model>
+                <name>Fixed</name>
+                <debug>1</debug>
+
+                <shipfunk_username>7b43731e</shipfunk_username>
+                <shipfunk_password>e80365a821cf72</shipfunk_password>
+                <shipfunk_url>https://dev.shipfunkservices.com/api/1.1/</shipfunk_url>
+                <shipfunk_default_warehouse>0</shipfunk_default_warehouse>
+                <shipfunk_sort_by_price>0</shipfunk_sort_by_price>
+                <shipfunk_group_by_category>0</shipfunk_group_by_category>
+                <shipfunk_package_card_size>A4</shipfunk_package_card_size>
+
+                <title>Shipfunk Shipping</title>
+                <sallowspecific>0</sallowspecific>
+                <showmethod>0</showmethod>
+                <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.
+                </specificerrmsg>
+
+                <weight_mapping>weight</weight_mapping>
+                <weight_unit>kg</weight_unit>
+                <weight_default>1</weight_default>
+                <length_mapping>shipfunk_length</length_mapping>
+                <length_unit>cm</length_unit>
+                <length_default>1</length_default>
+                <width_mapping>shipfunk_width</width_mapping>
+                <width_unit>cm</width_unit>
+                <width_default>1</width_default>
+                <depth_mapping>shipfunk_depth</depth_mapping>
+                <depth_unit>cm</depth_unit>
+                <depth_default>1</depth_default>
+                <max_package_weight>9999</max_package_weight>
+
+                <warehouse>Test Warehouse</warehouse>
+                <category_default>Other</category_default>
+                <category_sorting>1</category_sorting>
+
+                <parcels>
+                    <parcel_1>
+                        <parcel_name>Small Box</parcel_name>
+                        <outer_width>310</outer_width>
+                        <outer_length>310</outer_length>
+                        <outer_depth>310</outer_depth>
+                        <inner_width>309</inner_width>
+                        <inner_length>309</inner_length>
+                        <inner_depth>309</inner_depth>
+                        <empty_weight>100</empty_weight>
+                        <max_weight>4000</max_weight>
+                    </parcel_1>
+                    <parcel_2>
+                        <parcel_name>Medium Box</parcel_name>
+                        <outer_width>410</outer_width>
+                        <outer_length>410</outer_length>
+                        <outer_depth>410</outer_depth>
+                        <inner_width>409</inner_width>
+                        <inner_length>409</inner_length>
+                        <inner_depth>409</inner_depth>
+                        <empty_weight>150</empty_weight>
+                        <max_weight>6500</max_weight>
+                    </parcel_2>
+                    <parcel_3>
+                        <parcel_name>Large Box</parcel_name>
+                        <outer_width>510</outer_width>
+                        <outer_length>510</outer_length>
+                        <outer_depth>510</outer_depth>
+                        <inner_width>509</inner_width>
+                        <inner_length>509</inner_length>
+                        <inner_depth>509</inner_depth>
+                        <empty_weight>200</empty_weight>
+                        <max_weight>8000</max_weight>
+                    </parcel_3>
+                    <parcel_4>
+                        <parcel_name>Very Large Box</parcel_name>
+                        <outer_width>750</outer_width>
+                        <outer_length>750</outer_length>
+                        <outer_depth>750</outer_depth>
+                        <inner_width>749</inner_width>
+                        <inner_length>749</inner_length>
+                        <inner_depth>749</inner_depth>
+                        <empty_weight>300</empty_weight>
+                        <max_weight>12000</max_weight>
+                    </parcel_4>
+                    <parcel_5>
+                        <parcel_name>Very Large Box</parcel_name>
+                        <outer_width>3750</outer_width>
+                        <outer_length>3750</outer_length>
+                        <outer_depth>3750</outer_depth>
+                        <inner_width>3749</inner_width>
+                        <inner_length>3749</inner_length>
+                        <inner_depth>3749</inner_depth>
+                        <empty_weight>1000000</empty_weight>
+                        <max_weight>2000000</max_weight>
+                    </parcel_5>
+                </parcels>
+            </shipfunk>
+        </carriers>
+    </default>
+</config>

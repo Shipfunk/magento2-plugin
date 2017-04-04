@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Quote\Model\Cart\ShippingMethodConverter">
+        <plugin name="shipfunk_converter" type="Nord\Shipfunk\Plugin\ShippingMethodConverterPlugin"/>
+    </type>
+    <type name="Magento\Sales\Block\Adminhtml\Order\View">
+        <plugin name="BoxPackerButton" type="Nord\Shipfunk\Plugin\Block\Adminhtml\Order\View"/>
+    </type>
+    <type name="Magento\Shipping\Block\Adminhtml\Order\Packaging\Grid">
+        <plugin name="shipfunk_grid" type="Nord\Shipfunk\Plugin\GridPlugin"/>
+    </type>
+    <type name="Magento\Sales\Model\Order\Email\Sender\OrderSender">
+        <plugin name="shipfunk_sender" type="Nord\Shipfunk\Plugin\OrderSenderPlugin"/>
+    </type>
+
+    <preference for="Magento\Quote\Model\Quote\Address" type="Nord\Shipfunk\Model\Quote\Address"/>
+    <preference for="Magento\Quote\Model\ShippingMethodManagement" type="Nord\Shipfunk\Model\ShippingMethodManagement"/>
+
+    <preference for="Magento\Sales\Model\Order\Email\Sender\OrderSender"
+                type="Nord\Shipfunk\Model\ShipfunkOrderSender"/>
+
+
+    <preference for="Magento\Shipping\Model\Rate\Result" type="Nord\Shipfunk\Model\Rate\Result" />
+</config>

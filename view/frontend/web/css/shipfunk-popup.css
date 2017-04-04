@@ -1,0 +1,5 @@
+.block-shipfunk .points div { cursor:pointer; cursor: pointer;
+    background-color: #e6e6e6;
+    border: 1px solid lightgrey;
+    padding: 20px; }
+.block-shipfunk .points div.selected, .block-shipfunk .points div:hover {  border: 2px solid #2dd22d; }
