@@ -143,7 +143,7 @@ define(
                 });
                 $.ajax({
                     type: "POST",
-                    url: "/shipfunk/index/index",
+                    url: window.shipfunkPopup.baseUrl + "shipfunk/index/index",
                     timeout: 5000, // 5 second timeout in millis!
                     data: {'data': selectedData},
                     dataType: "json",
@@ -161,7 +161,7 @@ define(
                 var data = ['insert', carriercode(), productcode(), pickups];
                 $.ajax({
                     type: "POST",
-                    url: "/shipfunk/index/index",
+                    url: window.shipfunkPopup.baseUrl + "shipfunk/index/index",
                     timeout: 5000, // 5 second timeout in millis!
                     data: {'data': data},
                     dataType: "json",
@@ -179,7 +179,7 @@ define(
                 var data = ['delete', window.checkoutConfig.quoteItemData[0].quote_id];
                 $.ajax({
                     type: "POST",
-                    url: "/shipfunk/index/index",
+                    url: window.shipfunkPopup.baseUrl + "shipfunk/index/index",
                     timeout: 5000, // 5 second timeout in millis!
                     data: {'data': data},
                     dataType: "json",
