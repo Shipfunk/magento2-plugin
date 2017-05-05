@@ -19,7 +19,7 @@ define([
 
             $.ajax({
                 type: "POST",
-                url: "/shipfunk/index/index",
+                url: window.shipfunkPopup.baseUrl + "shipfunk/index/index",
                 timeout: 5000, // 5 second timeout in millis!
                 data: {'data': data},
                 dataType: "json",
