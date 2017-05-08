@@ -19,7 +19,7 @@ days,päivää
 "Pickup Info","Noutotiedot"
 "Payment Method","Maksutapa"
 "Shipping Method","Lähetystapa"
-"Your %store_name order confirmation","Sinun %store_name tilausvarmistus"
+"Your %store_name order confirmation","Teidän %store_name tilausvarmistus"
 "%name,","%name,"
 "If you have questions about your order, you can email us at <a href=""mailto:%store_email"">%store_email</a>.","Jos sinulla on kysyttävää tilauksestasi, voit lähettää sähköpostia meille <a href=""mailto:%store_email"">%store_email</a>."
 "Shipping Address","Lähetysosoite"
@@ -35,13 +35,13 @@ Next,Seuraava
 "Points selection is disabled.","Pisteiden valinta on poissa päältä."
 "Please select shipping method and/or pickup point.","Valitse toimitustapa ja/tai noutopiste, kiitos."
 Shipfunk,Shipfunk
-Enabled,Päällä
+Enabled,Käytössä
 "Shipfunk Username","Shipfunk Käyttäjätunnus"
 "Shipfunk Password","Shipfunk Salasana"
 "Dev Environment","Testiympäristö"
-Title,Titteli
+Title,Nimi
 "Ship to Applicable Countries","Lähetys käytettävissä oleviin maihin"
-"Ship to Specific Countries","Lähetys tiettyihin maihin"
+"Ship to Specific Countries","Lähetys valittuihin maihin"
 "Weight Attribute","Painomääre"
 "Weight Unit","Painoyksikkö"
 "Default Product Weight","Tuotteen oletuspaino"
