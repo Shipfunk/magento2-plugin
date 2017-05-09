@@ -19,7 +19,7 @@ days,päivää
 "Pickup Info","Noutotiedot"
 "Payment Method","Maksutapa"
 "Shipping Method","Lähetystapa"
-"Your %store_name order confirmation","Teidän %store_name tilausvarmistus"
+"Your %store_name order confirmation","Teidän %store_name tilausvarmistuksenne"
 "%name,","%name,"
 "If you have questions about your order, you can email us at <a href=""mailto:%store_email"">%store_email</a>.","Jos sinulla on kysyttävää tilauksestasi, voit lähettää sähköpostia meille <a href=""mailto:%store_email"">%store_email</a>."
 "Shipping Address","Lähetysosoite"
