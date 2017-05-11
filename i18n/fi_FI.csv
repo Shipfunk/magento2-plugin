@@ -12,7 +12,7 @@ days,päivää
 "If you have questions about your order, you can email us at <a href=""mailto:%store_email"">%store_email</a>","Jos sinulla on kysyttävää tilauksestasi, voit lähettää sähköpostia <a href=""mailto:%store_email"">%store_email</a>"
 "or call us at <a href=""tel:%store_phone"">%store_phone</a>","tai soittaa <a href=""tel:%store_phone"">%store_phone</a>"
 "Our hours are <span class=""no-link"">%store_hours</span>.","Aukioloaikamme ovat <span class=""no-link"">%store_hours</span>."
-"Your Order <span class=""no-link"">#%increment_id</span>","Tilauksesi <span class=""no-link"">#%increment_id</span>"
+"Your Order <span class=""no-link"">#%increment_id</span>","Tilauksenne <span class=""no-link"">#%increment_id</span>"
 "Placed on <span class=""no-link"">%created_at</span>","Tilausaika <span class=""no-link"">%created_at</span>"
 "Billing Info","Laskutustiedot"
 "Shipping Info","Lähetystiedot"
