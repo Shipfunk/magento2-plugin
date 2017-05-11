@@ -1,13 +1,13 @@
 <?php
 
-namespace Nord\Shipfunk\Model\Resource;
+namespace Nord\Shipfunk\Model\ParcelResource;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 /**
  * Class ParcelTemplates
  *
- * @package Nord\Shipfunk\Model\Resource
+ * @package Nord\Shipfunk\Model\ParcelResource
  */
 class ParcelTemplates extends AbstractDb
 {
