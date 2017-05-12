@@ -59,7 +59,7 @@ class TestOrderId extends AbstractApiHelper
             ->setRoute('test_order_id')
             ->get($xml, false);
 
-        echo 0;
+        $this->getResponse()->setBody(0);
     }
 
     /**

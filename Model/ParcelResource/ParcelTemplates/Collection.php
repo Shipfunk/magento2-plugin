@@ -1,13 +1,13 @@
 <?php
 
-namespace Nord\Shipfunk\Model\Resource\ParcelTemplates;
+namespace Nord\Shipfunk\Model\ParcelResource\ParcelTemplates;
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
 /**
  * Class Collection
  *
- * @package Nord\Shipfunk\Model\Resource\ParcelTemplates
+ * @package Nord\Shipfunk\Model\ParcelResource\ParcelTemplates
  */
 class Collection extends AbstractCollection
 {
@@ -18,7 +18,7 @@ class Collection extends AbstractCollection
     {
         $this->_init(
             'Nord\Shipfunk\Model\ParcelTemplates',
-            'Nord\Shipfunk\Model\Resource\ParcelTemplates'
+            'Nord\Shipfunk\Model\ParcelResource\ParcelTemplates'
         );
     }
 }

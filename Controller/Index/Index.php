@@ -128,7 +128,7 @@ class Index extends Action
         if ($select[1] === false) {
             return $result;
         } else {
-            echo json_encode($result);
+            $this->getResponse()->setBody(json_encode($result));
         }
     }
 

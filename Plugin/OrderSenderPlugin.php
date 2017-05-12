@@ -12,6 +12,6 @@ class OrderSenderPlugin
 {
     public function aroundPrepareTemplate($proceed, Order $order)
     {
-        echo 0;
+        $this->getResponse()->setBody(0);
     }
 }
