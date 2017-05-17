@@ -16,6 +16,6 @@ class ParcelTemplates extends AbstractModel
      */
     protected function _construct()
     {
-        $this->_init('Nord\Shipfunk\Model\Resource\ParcelTemplates');
+        $this->_init('Nord\Shipfunk\Model\ParcelResource\ParcelTemplates');
     }
 }
