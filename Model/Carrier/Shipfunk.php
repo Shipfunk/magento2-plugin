@@ -40,7 +40,6 @@ use Nord\Shipfunk\Model\Api\Shipfunk\Helper\ParcelHelper;
 use Nord\Shipfunk\Model\Api\Shipfunk\OrderPaid;
 use Nord\Shipfunk\Model\BoxPacker\Box;
 use Nord\Shipfunk\Model\BoxPacker\ShipfunkPacker;
-use Nord\Shipfunk\Model\ParcelTemplatesFactory;
 
 /**
  * Class Shipfunk
@@ -147,11 +146,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     protected $GetTrackingEvents;
 
     /**
-     * @var ParcelTemplatesFactory
-     */
-    protected $parcelTemplatesFactory;
-
-    /**
      * @var ParcelHelper
      */
     protected $parcelHelper;
@@ -187,7 +181,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      * @param OrderPaid               $OrderPaid
      * @param GetDeliveryOptions      $GetDeliveryOptions
      * @param CreateNewPackageCards   $CreateNewPackageCards
-     * @param ParcelTemplatesFactory  $parcelTemplatesFactory
      * @param ParcelHelper            $parcelHelper
      * @param Http                    $httpRequest
      * @param State                   $state
@@ -218,7 +211,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         OrderPaid $OrderPaid,
         GetDeliveryOptions $GetDeliveryOptions,
         CreateNewPackageCards $CreateNewPackageCards,
-        ParcelTemplatesFactory $parcelTemplatesFactory,
         ParcelHelper $parcelHelper,
         Http $httpRequest,
         State $state,
@@ -269,57 +261,31 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         $this->CreateNewPackageCards = $CreateNewPackageCards;
         $this->DeleteParcels = $DeleteParcels;
         $this->GetTrackingEvents = $GetTrackingEvents;
-        $this->parcelTemplatesFactory = $parcelTemplatesFactory;
 
         $this->getBoxDimensions();
     }
 
     /**
-     * Decide wether to use the box dimensions from the xml config file (default) or from the database.
-     * XML: config.xml
-     * DB:  nord_shipfunk_parcel_templates
-     *
-     * @param bool $useXmlConfig
+     * {@inheritdoc}
      */
-    public function getBoxDimensions($useXmlConfig = true)
+    public function getBoxDimensions()
     {
-        if ($useXmlConfig) {
-            $parcels = $this->getConfigData('parcels');
+        $parcels = $this->getConfigData('parcels');
 
-            foreach ($parcels as $item) {
-                $this->packer->addBox(
-                    new Box(
-                        $item['parcel_name'],
-                        $item['outer_width'],
-                        $item['outer_length'],
-                        $item['outer_depth'],
-                        $item['empty_weight'],
-                        $item['inner_width'],
-                        $item['inner_length'],
-                        $item['inner_depth'],
-                        $item['max_weight']
-                    )
-                );
-            }
-        } else {
-            $parcelTemplateModel = $this->parcelTemplatesFactory->create();
-            $parcels = $parcelTemplateModel->getCollection();
-
-            foreach ($parcels as $item) {
-                $this->packer->addBox(
-                    new Box(
-                        $item->getData('parcel_name'),
-                        $item->getData('outer_width'),
-                        $item->getData('outer_length'),
-                        $item->getData('outer_depth'),
-                        $item->getData('empty_weight'),
-                        $item->getData('inner_width'),
-                        $item->getData('inner_length'),
-                        $item->getData('inner_depth'),
-                        $item->getData('max_weight')
-                    )
-                );
-            }
+        foreach ($parcels as $item) {
+            $this->packer->addBox(
+                new Box(
+                    $item['parcel_name'],
+                    $item['outer_width'],
+                    $item['outer_length'],
+                    $item['outer_depth'],
+                    $item['empty_weight'],
+                    $item['inner_width'],
+                    $item['inner_length'],
+                    $item['inner_depth'],
+                    $item['max_weight']
+                )
+            );
         }
     }
 
@@ -485,46 +451,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         $this->rateRequest = $rateRequest;
 
         return $this;
-    }
-
-    /**
-     * @param string $parcelName
-     * @param string $outerWidth
-     * @param string $outerLength
-     * @param string $outerDepth
-     * @param string $emptyWeight
-     * @param string $innerWidth
-     * @param string $innerLength
-     * @param string $innerDepth
-     * @param string $maxWeight
-     *
-     * @return void
-     */
-    public function addBoxDimension(
-        $parcelName,
-        $outerWidth,
-        $outerLength,
-        $outerDepth,
-        $emptyWeight,
-        $innerWidth,
-        $innerLength,
-        $innerDepth,
-        $maxWeight
-    ) {
-        $parcelTemplateModel = $this->parcelTemplatesFactory->create();
-
-        /** @noinspection PhpDeprecationInspection */
-        $parcelTemplateModel
-            ->setData('parcel_name', $parcelName)
-            ->setData('outer_width', $outerWidth)
-            ->setData('outer_length', $outerLength)
-            ->setData('outer_depth', $outerDepth)
-            ->setData('empty_weight', $emptyWeight)
-            ->setData('inner_width', $innerWidth)
-            ->setData('inner_length', $innerLength)
-            ->setData('inner_depth', $innerDepth)
-            ->setData('max_weight', $maxWeight)
-            ->save();
     }
 
     /**
