@@ -631,7 +631,7 @@ class ParcelHelper
 
         $packedBoxes = $this->packer->pack();
 
-        $convertedBoxes = $this->convertBoxPackerToMagento($packedBoxes);
+        $convertedBoxes = $this->convertBoxPackerToMagento($packedBoxes, false);
 
         return $convertedBoxes;
     }
