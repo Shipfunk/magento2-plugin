@@ -22,7 +22,6 @@ use Nord\Shipfunk\Model\Api\Shipfunk\Helper\ParcelHelper;
 use Nord\Shipfunk\Model\BoxPacker\Box;
 use Nord\Shipfunk\Model\BoxPacker\Item;
 use Nord\Shipfunk\Model\BoxPacker\ShipfunkPacker;
-use Nord\Shipfunk\Model\ParcelTemplatesFactory;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -36,11 +35,6 @@ class Index extends Action
      * @var ShipmentLoader
      */
     protected $shipmentLoader;
-
-    /**
-     * @var ParcelTemplatesFactory
-     */
-    protected $parcelTemplatesFactory;
 
     /**
      * @var ParcelHelper
@@ -119,7 +113,6 @@ class Index extends Action
      * @param PageFactory            $resultPageFactory
      * @param UnitConverter          $unitConverter
      * @param ShipfunkPacker         $packer
-     * @param ParcelTemplatesFactory $parcelTemplatesFactory
      * @param ParcelHelper           $parcelHelper
      * @param Shipment               $orderShipment
      * @param CarrierFactory         $carrierFactory
@@ -136,7 +129,6 @@ class Index extends Action
         PageFactory $resultPageFactory,
         UnitConverter $unitConverter,
         ShipfunkPacker $packer,
-        ParcelTemplatesFactory $parcelTemplatesFactory,
         ParcelHelper $parcelHelper,
         Shipment $orderShipment,
         CarrierFactory $carrierFactory,
@@ -157,7 +149,6 @@ class Index extends Action
         $this->orderShipment = $orderShipment;
         $this->params = $context->getRequest()->getParams();
         $this->packer = $packer;
-        $this->parcelTemplatesFactory = $parcelTemplatesFactory;
         $this->parcelHelper = $parcelHelper;
         $this->shipmentLoader = $shipmentLoader;
         $this->CreateNewPackageCards = $CreateNewPackageCards;
@@ -272,20 +263,19 @@ class Index extends Action
      */
     public function getBoxDimensions()
     {
-        $parcelTemplateModel = $this->parcelTemplatesFactory->create();
-
-        foreach ($parcelTemplateModel->getCollection() as $item) {
+        $parcels = $this->helper->getConfigData('parcels');        
+        foreach ($parcels as $item) {
             $this->packer->addBox(
                 new Box(
-                    $item->getData('parcel_name'),
-                    $item->getData('outer_width'),
-                    $item->getData('outer_length'),
-                    $item->getData('outer_depth'),
-                    $item->getData('empty_weight'),
-                    $item->getData('inner_width'),
-                    $item->getData('inner_length'),
-                    $item->getData('inner_depth'),
-                    $item->getData('max_weight')
+                    $item['parcel_name'],
+                    $item['outer_width'],
+                    $item['outer_length'],
+                    $item['outer_depth'],
+                    $item['empty_weight'],
+                    $item['inner_width'],
+                    $item['inner_length'],
+                    $item['inner_depth'],
+                    $item['max_weight']
                 )
             );
         }

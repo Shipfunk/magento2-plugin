@@ -134,10 +134,12 @@ class CreateNewPackageCards extends AbstractApiHelper
         if (!isset($resultXml->parcel)) {
             // if we get an error here, it usually means that selecteddelivery has not been set or in most cases, we have a duplicate temp order id
             $response->setError(true);
+            /*
             $this->logger->log(
                 LogLevel::INFO,
                 "Shipfunk Error (CreateNewPackageCards) : ".$resultXml->Error->Message->__toString()
             );
+            */
             $errorMessage = __("shipfunk_error_7");
 
             $response->setErrors($errorMessage);
