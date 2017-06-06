@@ -16,8 +16,8 @@
                 <name>Fixed</name>
                 <debug>1</debug>
 
-                <shipfunk_username>7b43731e</shipfunk_username>
-                <shipfunk_password>e80365a821cf72</shipfunk_password>
+                <shipfunk_username>Your Shipfunk username</shipfunk_username>
+                <shipfunk_password>Your Shipfunk password</shipfunk_password>
                 <shipfunk_url>https://dev.shipfunkservices.com/api/1.1/</shipfunk_url>
                 <shipfunk_default_warehouse>0</shipfunk_default_warehouse>
                 <shipfunk_sort_by_price>0</shipfunk_sort_by_price>
@@ -44,7 +44,7 @@
                 <depth_default>1</depth_default>
                 <max_package_weight>9999</max_package_weight>
 
-                <warehouse>Test Warehouse</warehouse>
+                <warehouse>Extranet Warehouse</warehouse>
                 <category_default>Other</category_default>
                 <category_sorting>1</category_sorting>
 
