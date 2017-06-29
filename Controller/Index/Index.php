@@ -4,7 +4,6 @@ namespace Nord\Shipfunk\Controller\Index;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Nord\Shipfunk\Model\PickupsFactory;
 use Nord\Shipfunk\Model\SelectedPickupFactory;
@@ -21,11 +20,6 @@ class Index extends Action
      * @var JsonFactory
      */
     protected $resultJsonFactory;
-
-    /**
-     * @var mixed
-     */
-    protected $connection;
   
     protected $_pickupsFactory;
   
@@ -52,10 +46,6 @@ class Index extends Action
         $this->_selectedPickupCollectionFactory = $selectedPickupCollectionFactory;
 
         parent::__construct($context);
-
-        $objectManager    = ObjectManager::getInstance();
-        $resource         = $objectManager->get('Magento\Framework\App\ResourceConnection');
-        $this->connection = $resource->getConnection();
     }
 
     /**
