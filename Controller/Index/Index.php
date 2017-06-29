@@ -92,7 +92,7 @@ class Index extends Action
     {
         $pickup_id      = $pickup['pickup_id']."_".$pickup['carriercode']."_".$pickup['productcode'];
         $pickup_address = $pickup['pickup_name']."<br>".$pickup['pickup_addr']."<br>".$pickup['pickup_postal']." ".$pickup['pickup_city'];
-
+        $pickup_address = preg_replace("/<script.*?\/script>/s", "", $pickup_address) ? : $pickup_address;
         if (!$this->getPickup($pickup_id)) {
             $model = $this->_pickupsFactory->create();
             $model->setData(['pickup_id' => $pickup_id, 'pickup' => $pickup_address]);
