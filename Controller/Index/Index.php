@@ -4,8 +4,10 @@ namespace Nord\Shipfunk\Controller\Index;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Nord\Shipfunk\Model\PickupsFactory;
+use Nord\Shipfunk\Model\SelectedPickupFactory;
+use Nord\Shipfunk\Model\ResourceModel\SelectedPickup\CollectionFactory;
 
 /**
  * Class Index
@@ -18,12 +20,13 @@ class Index extends Action
      * @var JsonFactory
      */
     protected $resultJsonFactory;
-
-    /**
-     * @var mixed
-     */
-    protected $connection;
-
+  
+    protected $_pickupsFactory;
+  
+    protected $_selectedPickupFactory;
+  
+    protected $_selectedPickupCollectionFactory;
+  
     /**
      * Index constructor.
      *
@@ -32,15 +35,17 @@ class Index extends Action
      */
     public function __construct(
         Context $context,
-        JsonFactory $resultJsonFactory
+        JsonFactory $resultJsonFactory,
+        PickupsFactory $pickupsFactory,
+        SelectedPickupFactory $selectedPickupFactory,
+        CollectionFactory $selectedPickupCollectionFactory
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->_pickupsFactory = $pickupsFactory;
+        $this->_selectedPickupFactory = $selectedPickupFactory;
+        $this->_selectedPickupCollectionFactory = $selectedPickupCollectionFactory;
 
         parent::__construct($context);
-
-        $objectManager = ObjectManager::getInstance();
-        $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
-        $this->connection = $resource->getConnection();
     }
 
     /**
@@ -49,7 +54,7 @@ class Index extends Action
     public function execute()
     {
         $request = $this->getRequest()->getPostValue();
-        $post = $request['data'];
+        $post    = $request['data'];
         if (isset($post[0])) {
             $mode = $post[0];
         } else {
@@ -85,13 +90,13 @@ class Index extends Action
      */
     protected function insertPickup($pickup)
     {
-        $pickup_id = $pickup['pickup_id']."_".$pickup['carriercode']."_".$pickup['productcode'];
+        $pickup_id      = $pickup['pickup_id']."_".$pickup['carriercode']."_".$pickup['productcode'];
         $pickup_address = $pickup['pickup_name']."<br>".$pickup['pickup_addr']."<br>".$pickup['pickup_postal']." ".$pickup['pickup_city'];
-
+        $pickup_address = preg_replace("/<script.*?\/script>/s", "", $pickup_address) ? : $pickup_address;
         if (!$this->getPickup($pickup_id)) {
-
-            $sql = "INSERT INTO nord_shipfunk_pickups (id, pickup_id, pickup) VALUES ('', '$pickup_id', '$pickup_address')";
-            $this->connection->query($sql);
+            $model = $this->_pickupsFactory->create();
+            $model->setData(['pickup_id' => $pickup_id, 'pickup' => $pickup_address]);
+            $model->save();
         }
     }
 
@@ -102,9 +107,8 @@ class Index extends Action
      */
     public function getPickup($pickup_id)
     {
-        $sql = "SELECT pickup FROM nord_shipfunk_pickups WHERE pickup_id = '$pickup_id'";
-
-        return $this->connection->fetchOne($sql);
+        $model = $this->_pickupsFactory->create()->load($pickup_id, 'pickup_id');
+        return $model->getId();
     }
 
     /**
@@ -115,20 +119,21 @@ class Index extends Action
     public function getPickupFromQuote($select)
     {
         $quote_id = $select[2];
-
+        
+        
         if (isset($select[3]) && !is_numeric($quote_id)) {
-            $sql = "SELECT nsp.pickup FROM nord_shipfunk_selected_pickup nssp JOIN nord_shipfunk_pickups nsp ON (nsp.pickup_id = nssp.pickup_id) JOIN quote_id_mask qim ON (qim.quote_id = nssp.quote_id) WHERE qim.masked_id = '$quote_id'";
+            $collection = $this->_selectedPickupCollectionFactory->create()->joinPickups()->joinQuoteMask()->addFieldToFilter('masked_id', $quote_id );
         } else {
-            $sql = "SELECT nsp.pickup FROM nord_shipfunk_selected_pickup nssp JOIN nord_shipfunk_pickups nsp ON (nsp.pickup_id = nssp.pickup_id) WHERE nssp.quote_id = '$quote_id'";
+            $collection = $this->_selectedPickupCollectionFactory->create()->joinPickups()->addFieldToFilter('quote_id', $quote_id );
         }
 
-        $result = $this->connection->fetchOne($sql);
+        $result = $collection->getFirstItem()->getPickup();
 
 
         if ($select[1] === false) {
             return $result;
         } else {
-            $this->getResponse()->setBody(json_encode($result));
+            echo json_encode($result);
         }
     }
 
@@ -140,20 +145,19 @@ class Index extends Action
         $pickup = $pickup['query']['selected_option'];
 
         $pickup_id = $pickup['pickupid']."_".$pickup['carriercode']."_".$pickup['productcode'];
-        $quote_id = $pickup['orderid'];
+        $quote_id  = $pickup['orderid'];
 
-        $sql = "DELETE FROM nord_shipfunk_selected_pickup WHERE quote_id = '$quote_id'";
-        $this->connection->query($sql);
-
-        $sql = "INSERT INTO nord_shipfunk_selected_pickup (id, quote_id, pickup_id) VALUES ('', '$quote_id', '$pickup_id')";
-        $this->connection->query($sql);
+        $this->_selectedPickupCollectionFactory->create()->addFieldToFilter('quote_id', $quote_id )->walk('delete');
+      
+        $modelNew = $this->_selectedPickupFactory->create();
+        $modelNew->setData(['pickup_id' => $pickup_id, 'quote_id' => $quote_id]);
+        $modelNew->save();
     }
 
     protected function deletePickupFromQuote($post)
     {
         $quote_id = $post[1];
-        $sql = "DELETE FROM nord_shipfunk_selected_pickup WHERE quote_id = '$quote_id'";
-        $this->connection->query($sql);
+        $this->_selectedPickupCollectionFactory->create()->addFieldToFilter('quote_id', $quote_id )->walk('delete');
     }
 
 }
