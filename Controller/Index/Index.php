@@ -90,9 +90,34 @@ class Index extends Action
      */
     protected function insertPickup($pickup)
     {
+        // Field validation:
+        if(!ctype_alnum($pickup['pickup_id'])) // id must be alphanumeric(chars and digits only)
+            return false;
+
+        if(!ctype_digit($pickup['carriercode'])) // carriercode must be numeric only
+            return false;
+
+        if(!ctype_digit($pickup['productcode'])) // productcode must be numeric only
+            return false;
+
+        if(!ctype_digit($pickup['pickup_postal'])) // pickup_postal must be numeric only
+            return false;
+
+        if(!preg_match("/\A[\w .,!()+`,\":\/&€$-]+\z/u", $pickup['pickup_name'])) // pickup_name can have limited types of chars
+            return false;
+
+        if(!preg_match("/\A[\w .,!()+`,\":\/&€$-]+\z/u", $pickup['pickup_addr'])) // pickup_addr can have limited types of chars
+            return false;
+
+        if(!preg_match("/\A[\w .,!()+`,\":\/&€$-]+\z/u", $pickup['pickup_city'])) // pickup_city can have limited types of chars
+            return false;
+
+        $pickup['pickup_name'] = htmlspecialchars($pickup['pickup_name'], ENT_QUOTES, 'UTF-8');
+        $pickup['pickup_addr'] = htmlspecialchars($pickup['pickup_addr'], ENT_QUOTES, 'UTF-8');
+        $pickup['pickup_city'] = htmlspecialchars($pickup['pickup_city'], ENT_QUOTES, 'UTF-8');
+
         $pickup_id      = $pickup['pickup_id']."_".$pickup['carriercode']."_".$pickup['productcode'];
         $pickup_address = $pickup['pickup_name']."<br>".$pickup['pickup_addr']."<br>".$pickup['pickup_postal']." ".$pickup['pickup_city'];
-        $pickup_address = preg_replace("/<script.*?\/script>/s", "", $pickup_address) ? : $pickup_address;
         if (!$this->getPickup($pickup_id)) {
             $model = $this->_pickupsFactory->create();
             $model->setData(['pickup_id' => $pickup_id, 'pickup' => $pickup_address]);
