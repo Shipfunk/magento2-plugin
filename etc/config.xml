@@ -25,7 +25,8 @@
                 <shipfunk_package_card_size>A4</shipfunk_package_card_size>
 
                 <title>Shipfunk Shipping</title>
-                <sallowspecific>0</sallowspecific>
+                <sallowspecific>1</sallowspecific>
+                <specificcountry>FI</specificcountry>
                 <showmethod>0</showmethod>
                 <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.
                 </specificerrmsg>
