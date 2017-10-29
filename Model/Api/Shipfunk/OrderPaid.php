@@ -6,7 +6,6 @@ use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
 use Nord\Shipfunk\Model\Api\Shipfunk\Helper\CustomerHelper;
 use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
 use Magento\Framework\View\Element\Template\Context;
-use Requests;
 
 /**
  * Class OrderPaid
@@ -15,22 +14,6 @@ use Requests;
  */
 class OrderPaid extends AbstractApiHelper
 {
-
-    /**
-     * OrderPaid constructor.
-     *
-     * @param Context            $context
-     * @param ShipfunkDataHelper $shipfunkDataHelper
-     * @param CustomerHelper     $customerHelper
-     */
-    public function __construct(
-        Context $context,
-        ShipfunkDataHelper $shipfunkDataHelper,
-        CustomerHelper $customerHelper
-    ) {
-        parent::__construct($context, $shipfunkDataHelper, $customerHelper);
-    }
-
     /**
      * @return string
      */
@@ -43,7 +26,7 @@ class OrderPaid extends AbstractApiHelper
      * @param \SimpleXMLElement $xml
      * @param bool              $transmitWebshopId
      *
-     * @return \Requests_Response
+     * @return \Zend_Http_Response
      */
     protected function get($xml, $transmitWebshopId = false)
     {
@@ -52,8 +35,13 @@ class OrderPaid extends AbstractApiHelper
             $this->getQuoteId()."/".
             $this->getWebshopId()."/".
             $this->getOrderId()."/".
-            $this->getRestFormat();
-        $result         = Requests::get($url, $this->getHeaders());
+            $this->getRestFormat();      
+      
+        $client = $this->_httpClientFactory->create();
+        $client->setUri((string) $url);
+        $client->setConfig(['maxredirects' => 0, 'timeout' => 30]);
+        $client->setHeaders($this->getHeaders());
+        $result = $client->request(\Magento\Framework\HTTP\ZendClient::GET);
 
         return $result;
     }

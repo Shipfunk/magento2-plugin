@@ -6,12 +6,14 @@ use Magento\Shipping\Model\Tracking\ResultFactory;
 use Magento\Shipping\Model\Tracking\Result\ErrorFactory;
 use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
 use Nord\Shipfunk\Model\Api\Shipfunk\Helper\CustomerHelper;
+use Magento\Framework\HTTP\ZendClientFactory;
 use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Shipping\Model\Tracking\Result\StatusFactory;use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class GetTrackingEvents
@@ -49,14 +51,15 @@ class GetTrackingEvents extends AbstractApiHelper implements LoggerAwareInterfac
      * @param ResultFactory      $trackFactory
      */
     public function __construct(
-        Context $context,
+        \Psr\Log\LoggerInterface $logger,
         ShipfunkDataHelper $shipfunkDataHelper,
         CustomerHelper $customerHelper,
+        \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
         ErrorFactory $trackErrorFactory,
         StatusFactory $trackStatusFactory,
         ResultFactory $trackFactory
     ) {
-        parent::__construct($context, $shipfunkDataHelper, $customerHelper);
+        parent::__construct($logger, $shipfunkDataHelper, $customerHelper, $httpClientFactory);
 
         $this->trackErrorFactory  = $trackErrorFactory;
         $this->trackStatusFactory = $trackStatusFactory;
@@ -71,11 +74,6 @@ class GetTrackingEvents extends AbstractApiHelper implements LoggerAwareInterfac
      */
     public function getResult($trackings)
     {
-        $trackings11 = [
-            'MA0940098500010816701/Matkahuolto',
-            'JJFI62842801100000018/Posti',
-        ];
-
         if (is_string($trackings)) {
             $trackings = [$trackings];
         }
@@ -90,7 +88,8 @@ class GetTrackingEvents extends AbstractApiHelper implements LoggerAwareInterfac
                 ->setRouteAndFieldname('gettrackingevents_with_code_company')
                 ->setRestFormat('/xml/'.$tracking)
                 ->get($xml, true);
-            $resultXml = simplexml_load_string($result->body);
+          
+            $resultXml = simplexml_load_string($result->getBody());
 
             if (strstr($tracking, "/")) {
                 $trackingXpld    = explode("/", $tracking);

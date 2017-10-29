@@ -4,8 +4,8 @@ namespace Nord\Shipfunk\Model\Api\Shipfunk\Helper;
 
 use Magento\Framework\View\Element\Template\Context,
     SimpleXMLElement,
-    Requests_Response,
-    Requests,
+    Magento\Framework\HTTP\ZendClient,
+    Magento\Framework\HTTP\ZendClientFactory,
     Magento\Quote\Model\Quote,
     DVDoug\BoxPacker\PackedBoxList,
     Psr\Log\LoggerInterface,
@@ -19,7 +19,7 @@ use Magento\Shipping\Model\Shipment\Request;
  *
  * @package Nord\Shipfunk\Helper
  */
-class AbstractApiHelper
+class AbstractApiHelper extends \Magento\Framework\DataObject
 {
     /**
      * Code
@@ -182,6 +182,36 @@ class AbstractApiHelper
      * @var string
      */
     protected $restFormat = "/xml/json";
+  
+    /**
+     * @var \Magento\Framework\HTTP\ZendClientFactory
+     */
+    protected $_httpClientFactory;
+  
+    /**
+     * AbstractApiHelper constructor.
+     *
+     * @param Context            $context
+     * @param ShipfunkDataHelper $shipfunkDataHelper
+     * @param CustomerHelper     $customerHelper
+     * @param \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory
+     */
+    public function __construct(
+        \Psr\Log\LoggerInterface $logger,
+        ShipfunkDataHelper $shipfunkDataHelper,
+        CustomerHelper $customerHelper,
+        \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory
+    ) {
+        $this->customerHelper = $customerHelper;
+        $this->helper         = $shipfunkDataHelper;
+        $this->log            = $logger;
+        $this->_httpClientFactory = $httpClientFactory;
+
+        $this->setLogin(
+            $this->helper->getConfigData('shipfunk_username'),
+            $this->helper->getConfigData('shipfunk_password')
+        );
+    }
 
     /**
      * @param string $id
@@ -240,6 +270,9 @@ class AbstractApiHelper
         }
 
         return $environmentUrl.$this->getRoute().$this->getRestFormat();
+      
+      
+        // return $this->helper->getConfigData('api_url') . $this->getRoute() . '/' . 'true' . '/' . $this->getRestFormat() . '/' . $this->getOrderId();
     }
 
     /**
@@ -708,46 +741,6 @@ class AbstractApiHelper
     }
 
     /**
-     * AbstractApiHelper constructor.
-     *
-     * @param Context            $context
-     * @param ShipfunkDataHelper $shipfunkDataHelper
-     * @param CustomerHelper     $customerHelper
-     */
-    public function __construct(
-        Context $context,
-        ShipfunkDataHelper $shipfunkDataHelper,
-        CustomerHelper $customerHelper
-    ) {
-        $this->customerHelper = $customerHelper;
-        $this->helper         = $shipfunkDataHelper;
-        $this->log            = $context->getLogger();
-
-        $this->setLogin(
-            $this->helper->getConfigData('shipfunk_username'),
-            $this->helper->getConfigData('shipfunk_password')
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function getOrderDetails()
-    {
-        /** @var Quote\Address\Total $totals */
-        /** @noinspection PhpUndefinedMethodInspection */
-        $orderDetails = [
-            'orderid'        => $this->getOrder()->getId(),
-            'order_currency' => 'EUR', //$this->getOrder()->getCurrency()->getGlobalCurrencyCode(),
-            'order_lang'     => 'EN',
-            'order_price'    => $this->getOrder()->getTotals()['subtotal']->getValue(),
-            //'order_get_pickups' => 0,  // 0 for popup | 1 (default) for ShippingAdditional block
-        ];
-
-        return $orderDetails;
-    }
-
-    /**
      * @return array
      */
     public function getCustomer()
@@ -824,13 +817,18 @@ class AbstractApiHelper
      * @param SimpleXMLElement $xml
      * @param bool             $transmitWebshopId
      *
-     * @return Requests_Response
+     * @return \Zend_Http_Response
      */
     protected function post($xml, $transmitWebshopId = false)
     {
-        $result = Requests::post($this->getApiUrl($transmitWebshopId), $this->getHeaders(),
-            ['sf_'.$this->getFieldname() => $xml]);
-
+        $data = ['sf_'.$this->getFieldname() => $xml];
+        $client = $this->_httpClientFactory->create();
+        $client->setUri((string) $this->getApiUrl($transmitWebshopId));
+        $client->setConfig(['maxredirects' => 0, 'timeout' => 30]);
+        $client->setHeaders($this->getHeaders());
+        $client->setParameterPost($data);
+        $result = $client->request(\Magento\Framework\HTTP\ZendClient::POST);
+      
         return $result;
     }
 
@@ -838,13 +836,19 @@ class AbstractApiHelper
      * @param  SimpleXMLElement $xml
      * @param bool              $transmitWebshopId
      *
-     * @return Requests_Response
+     * @return \Zend_Http_Response
      */
     protected function get($xml, $transmitWebshopId = false)
     {
-        $result = Requests::get($this->getApiUrl($transmitWebshopId), $this->getHeaders(),
-            ['sf_'.$this->getFieldname() => $xml]);
-
+        $data = ['sf_'.$this->getFieldname() => $xml];
+      
+        $client = $this->_httpClientFactory->create();
+        $client->setUri((string) $this->getApiUrl($transmitWebshopId));
+        $client->setConfig(['maxredirects' => 0, 'timeout' => 30]);
+        $client->setHeaders($this->getHeaders());
+        $client->setParameterGet($data);
+        $result = $client->request(\Magento\Framework\HTTP\ZendClient::GET);
+      
         return $result;
     }
 }

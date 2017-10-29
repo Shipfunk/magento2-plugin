@@ -309,7 +309,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      */
     public function isTrackingAvailable()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -338,14 +338,10 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         $this->setRateRequest($request);
 
         $result = $this->_rateFactory->create();
-
+        // SHIPFUNK REQUIRES AN ADDRESS, BUT MAGE DOESN'T INCLUDE STREET ADDRESS IN SHIPPING REQUEST BY DEFAULT
         if (!$request->getDestStreet()) {
             return $result;
         }
-        // THE REQUEST NEEDS TO GET VALIDATED HERE BEFORE TRYING TO CONTACT SHIPFUNK
-        // SHIPFUNK REQUIRES AN ADDRESS, BUT MAGE DOESN'T INCLUDE STREET ADDRESS IN SHIPPING REQUEST BY DEFAULT
-        //$simulate = json_decode('{"response":{"90000000":{"Carriercode":"90000000","Companyname":"Shipfunk","Options":[{"carriercode":90000002,"productname":"Kotiinkuljetus","productcode":"0000002","realprice":"106.04","discounted_price":"106.04","delivtime":"3-4","info":"Vastaanottajalle ilmoitetaan saapuneesta paketista puhelimitse ja sovitaan jakeluaika.","green_delivery":false,"category":null,"normal_delivery":false,"home_delivery":true,"express_oneday_delivery":false,"express_sameday_delivery":false,"express_sameday_final_ordertime":false,"announcement":null,"haspickups":false},{"carriercode":90000001,"productname":"Noutopistetoimitus","productcode":"0000001","realprice":"100.66","discounted_price":"100.66","delivtime":"3-4","info":"Paketti noudetaan saapumisilmoituksessa ilmoitetusta toimipisteestä. Paketti luovutetaan henkilötodistusta vastaan. Henkilöllisyyden voi todistaa ajokortilla, passilla tai poliisin myöntämällä henkilökortilla. Jos paketin noutaja on muu kuin osoitekorttiin merkitty vastaanottaja, täytyy paketin noutajalla olla mukana henkilötodistuksensa lisäksi valtakirja.","green_delivery":false,"category":null,"normal_delivery":true,"home_delivery":false,"express_oneday_delivery":false,"express_sameday_delivery":false,"express_sameday_final_ordertime":false,"announcement":null,"haspickups":false}]}}}');
-        //$this->_debug($simulate);
 
         $shippingMethods = $this->getShipfunkShippingMethods();
 
@@ -430,7 +426,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
             ->getResult();
 
 
-        return json_decode($result->body);
+        return json_decode($result->getBody());
     }
 
     /**

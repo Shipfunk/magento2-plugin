@@ -9,9 +9,11 @@ use Magento\Sales\Model\OrderFactory;
 use Magento\Shipping\Model\Shipment\Request;
 use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
 use Nord\Shipfunk\Model\Api\Shipfunk\Helper\CustomerHelper;
+use Magento\Framework\HTTP\ZendClientFactory;
 use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
 use Magento\Framework\View\Element\Template\Context;
 use Nord\Shipfunk\Model\Api\Shipfunk\Helper\ParcelHelper;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class CreateNewPackageCards
@@ -52,15 +54,16 @@ class CreateNewPackageCards extends AbstractApiHelper
      * @param ShippingFactory $shippingFactory
      */
     public function __construct(
-        Context $context,
+        \Psr\Log\LoggerInterface $logger,
         ShipfunkDataHelper $shipfunkDataHelper,
         CustomerHelper $customerHelper,
+        \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
         ParcelHelper $parcelHelper,
         QuoteFactory $quoteFactory,
         OrderFactory $orderFactory,
         ShippingFactory $shippingFactory
     ) {
-        parent::__construct($context, $shipfunkDataHelper, $customerHelper);
+        parent::__construct($logger, $shipfunkDataHelper, $customerHelper, $httpClientFactory);
 
         $this->parcelHelper = $parcelHelper;
         $this->quoteFactory = $quoteFactory;
@@ -128,7 +131,7 @@ class CreateNewPackageCards extends AbstractApiHelper
             ->setFieldname('createnewpgcard')
             ->post($xml);
 
-        $resultXml = simplexml_load_string($result->body);
+        $resultXml = simplexml_load_string($result->getBody());
         $response = new DataObject();
 
         if (!isset($resultXml->parcel)) {
