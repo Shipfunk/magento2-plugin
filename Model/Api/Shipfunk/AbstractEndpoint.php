@@ -1,6 +1,6 @@
 <?php
 
-namespace Nord\Shipfunk\Model\Api\Shipfunk\Helper;
+namespace Nord\Shipfunk\Model\Api\Shipfunk;
 
 use Magento\Framework\View\Element\Template\Context,
     SimpleXMLElement,
@@ -15,11 +15,10 @@ use Magento\Framework\View\Element\Template\Context,
 use Magento\Shipping\Model\Shipment\Request;
 
 /**
- * Class ApiHelper
+ * Abstract endpoint call
  *
- * @package Nord\Shipfunk\Helper
  */
-class AbstractApiHelper extends \Magento\Framework\DataObject
+abstract class AbstractEndpoint extends \Magento\Framework\DataObject
 {
     /**
      * Code

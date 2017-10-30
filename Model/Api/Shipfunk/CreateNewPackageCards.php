@@ -3,72 +3,14 @@
 namespace Nord\Shipfunk\Model\Api\Shipfunk;
 
 use Magento\Framework\DataObject;
-use Magento\Quote\Model\QuoteFactory;
-use Magento\Quote\Model\ShippingFactory;
-use Magento\Sales\Model\OrderFactory;
-use Magento\Shipping\Model\Shipment\Request;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
-use Magento\Framework\HTTP\ZendClientFactory;
-use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
-use Magento\Framework\View\Element\Template\Context;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\ParcelHelper;
-use Psr\Log\LoggerInterface;
 
 /**
  * Class CreateNewPackageCards
  *
  * @package Nord\Shipfunk\Model\Api\Shipfunk
  */
-class CreateNewPackageCards extends AbstractApiHelper
+class CreateNewPackageCards extends AbstractEndpoint
 {
-    /**
-     * @var ParcelHelper
-     */
-    protected $parcelHelper;
-
-    /**
-     * @var QuoteFactory
-     */
-    protected $quoteFactory;
-
-    /**
-     * @var OrderFactory
-     */
-    protected $orderFactory;
-
-    /**
-     * @var ShippingFactory
-     */
-    protected $shippingFactory;
-
-    /**
-     * CreateNewPackageCards constructor.
-     *
-     * @param Context $context
-     * @param ShipfunkDataHelper $shipfunkDataHelper
-     * @param ParcelHelper $parcelHelper
-     * @param QuoteFactory $quoteFactory
-     * @param OrderFactory $orderFactory
-     * @param ShippingFactory $shippingFactory
-     */
-    public function __construct(
-        \Psr\Log\LoggerInterface $logger,
-        ShipfunkDataHelper $shipfunkDataHelper,
-        \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
-        ParcelHelper $parcelHelper,
-        QuoteFactory $quoteFactory,
-        OrderFactory $orderFactory,
-        ShippingFactory $shippingFactory
-    ) {
-        parent::__construct($logger, $shipfunkDataHelper, $httpClientFactory);
-
-        $this->parcelHelper = $parcelHelper;
-        $this->quoteFactory = $quoteFactory;
-        $this->orderFactory = $orderFactory;
-        $this->shippingFactory = $shippingFactory;
-
-    }
-
     /**
      * @return string
      */
@@ -82,7 +24,6 @@ class CreateNewPackageCards extends AbstractApiHelper
      */
     public function getResult()
     {
-        /** @var Request $request */
         $request = $this->getRequest();
 
         $this->setOrder($request->getOrderShipment()->getOrder());

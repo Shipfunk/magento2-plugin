@@ -2,65 +2,13 @@
 
 namespace Nord\Shipfunk\Model\Api\Shipfunk;
 
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
-
 /**
  * Class DeleteParcels
  *
  * @package Nord\Shipfunk\Model\Api\Shipfunk
  */
-class DeleteParcels extends AbstractApiHelper
+class DeleteParcels extends AbstractEndpoint
 {
-    /**
-     * @var string
-     */
-    protected $parcelCode;
-
-    /**
-     * @var string
-     */
-    protected $trackingCode;
-
-    /**
-     * @return mixed
-     */
-    public function getParcelCode()
-    {
-        return $this->parcelCode;
-    }
-
-    /**
-     * @param string $parcelCode
-     *
-     * @return DeleteParcels
-     */
-    public function setParcelCode($parcelCode)
-    {
-        $this->parcelCode = $parcelCode;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTrackingCode()
-    {
-        return $this->trackingCode;
-    }
-
-    /**
-     * @param string $trackingCode
-     *
-     * @return DeleteParcels
-     */
-    public function setTrackingCode($trackingCode)
-    {
-        $this->trackingCode = $trackingCode;
-
-        return $this;
-    }
-
     /**
      * @return void
      */

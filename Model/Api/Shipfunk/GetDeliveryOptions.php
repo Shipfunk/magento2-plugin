@@ -2,43 +2,13 @@
 
 namespace Nord\Shipfunk\Model\Api\Shipfunk;
 
-use Magento\Framework\View\Element\Template\Context;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
-use Magento\Framework\HTTP\ZendClientFactory;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\ParcelHelper;
-use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
-use Psr\Log\LoggerInterface;
-
 /**
  * Class GetDeliveryOptions
  *
  * @package Nord\Shipfunk\Model\Api\Shipfunk
  */
-class GetDeliveryOptions extends AbstractApiHelper
+class GetDeliveryOptions extends AbstractEndpoint
 {
-    /**
-     * @var ParcelHelper
-     */
-    protected $parcelHelper;
-
-    /**
-     * GetDeliveryOptions constructor.
-     *
-     * @param Context            $context
-     * @param ShipfunkDataHelper $shipfunkDataHelper
-     * @param ParcelHelper       $parcelHelper
-     */
-    public function __construct(
-        \Psr\Log\LoggerInterface $logger,
-        ShipfunkDataHelper $shipfunkDataHelper,
-        \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
-        ParcelHelper $parcelHelper
-    ) {
-        parent::__construct($logger, $shipfunkDataHelper, $httpClientFactory);
-
-        $this->parcelHelper = $parcelHelper;
-    }
-
     /**
      * @return \Requests_Response|string
      */
@@ -75,9 +45,6 @@ class GetDeliveryOptions extends AbstractApiHelper
                 ],
             ], $this->simpleXml, 'order');
         }
-
-        $this->parcelHelper->setOrder($order);
-
         $xml = $this->simpleXml->asXML();
         $this->log->debug(var_export($xml, true));
         $result = $this->setRouteAndFieldname('get_delivoptions')->post($xml);

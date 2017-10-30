@@ -2,16 +2,12 @@
 
 namespace Nord\Shipfunk\Model\Api\Shipfunk;
 
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
-use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
-use Magento\Framework\View\Element\Template\Context;
-
 /**
  * Class OrderPaid
  *
  * @package Nord\Shipfunk\Model\Api\Shipfunk
  */
-class OrderPaid extends AbstractApiHelper
+class OrderPaid extends AbstractEndpoint
 {
     /**
      * @return string

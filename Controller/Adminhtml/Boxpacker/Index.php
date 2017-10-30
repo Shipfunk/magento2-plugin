@@ -18,7 +18,7 @@ use Magento\Shipping\Model\Shipping\LabelGenerator;
 use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
 use Nord\Shipfunk\Helper\UnitConverter;
 use Nord\Shipfunk\Model\Api\Shipfunk\CreateNewPackageCards;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\ParcelHelper;
+use Nord\Shipfunk\Helper\ParcelHelper;
 use Nord\Shipfunk\Model\BoxPacker\Box;
 use Nord\Shipfunk\Model\BoxPacker\Item;
 use Nord\Shipfunk\Model\BoxPacker\ShipfunkPacker;

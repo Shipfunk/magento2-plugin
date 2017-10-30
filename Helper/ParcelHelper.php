@@ -1,7 +1,8 @@
 <?php
 
-namespace Nord\Shipfunk\Model\Api\Shipfunk\Helper;
+namespace Nord\Shipfunk\Helper;
 
+use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Nord\Shipfunk\Helper\UnitConverter;
 use Nord\Shipfunk\Model\BoxPacker\Box;
@@ -15,9 +16,9 @@ use Nord\Shipfunk\Model\BoxPacker\ShipfunkPacker;
 /**
  * Class Parcel
  *
- * @package Nord\Shipfunk\Model\Api
+ * @package Nord\Shipfunk\Helper
  */
-class ParcelHelper
+class ParcelHelper extends AbstractHelper
 {
     /**
      * @var string
@@ -100,21 +101,6 @@ class ParcelHelper
     protected $tracking_code_return;
 
     /**
-     * @var array
-     */
-    protected $order;
-
-    /**
-     * @var int
-     */
-    protected $quoteId;
-
-    /**
-     * @var string
-     */
-    protected $orderId;
-
-    /**
      * @var mixed
      */
     protected $product;
@@ -156,69 +142,6 @@ class ParcelHelper
         $this->unitConverter = $unitConverter;
         $this->helper = $shipfunkDataHelper;
 
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getOrder()
-    {
-        return $this->order;
-    }
-
-    /**
-     * TODO: THIS COULD BE A BUG ! CHECK IF orderid is really the quote id
-     *
-     * @param mixed $order
-     *
-     * @return ParcelHelper
-     */
-    public function setOrder($order)
-    {
-        $this->order = $order;
-        $this->setQuoteId($order['orderid']);
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getQuoteId()
-    {
-        return $this->quoteId;
-    }
-
-    /**
-     * @param int $quoteId
-     *
-     * @return ParcelHelper
-     */
-    public function setQuoteId($quoteId)
-    {
-        $this->quoteId = $quoteId;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOrderId()
-    {
-        return $this->orderId;
-    }
-
-    /**
-     * @param string $orderId
-     *
-     * @return ParcelHelper
-     */
-    public function setOrderId($orderId)
-    {
-        $this->orderId = $orderId;
-
-        return $this;
     }
 
     /**
