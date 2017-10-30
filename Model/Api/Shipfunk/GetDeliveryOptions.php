@@ -4,7 +4,6 @@ namespace Nord\Shipfunk\Model\Api\Shipfunk;
 
 use Magento\Framework\View\Element\Template\Context;
 use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\CustomerHelper;
 use Magento\Framework\HTTP\ZendClientFactory;
 use Nord\Shipfunk\Model\Api\Shipfunk\Helper\ParcelHelper;
 use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
@@ -27,17 +26,15 @@ class GetDeliveryOptions extends AbstractApiHelper
      *
      * @param Context            $context
      * @param ShipfunkDataHelper $shipfunkDataHelper
-     * @param CustomerHelper     $customerHelper
      * @param ParcelHelper       $parcelHelper
      */
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
         ShipfunkDataHelper $shipfunkDataHelper,
-        CustomerHelper $customerHelper,
         \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
         ParcelHelper $parcelHelper
     ) {
-        parent::__construct($logger, $shipfunkDataHelper, $customerHelper, $httpClientFactory);
+        parent::__construct($logger, $shipfunkDataHelper, $httpClientFactory);
 
         $this->parcelHelper = $parcelHelper;
     }

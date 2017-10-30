@@ -8,7 +8,6 @@ use Magento\Quote\Model\ShippingFactory;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Shipping\Model\Shipment\Request;
 use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\CustomerHelper;
 use Magento\Framework\HTTP\ZendClientFactory;
 use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
 use Magento\Framework\View\Element\Template\Context;
@@ -47,7 +46,6 @@ class CreateNewPackageCards extends AbstractApiHelper
      *
      * @param Context $context
      * @param ShipfunkDataHelper $shipfunkDataHelper
-     * @param CustomerHelper $customerHelper
      * @param ParcelHelper $parcelHelper
      * @param QuoteFactory $quoteFactory
      * @param OrderFactory $orderFactory
@@ -56,14 +54,13 @@ class CreateNewPackageCards extends AbstractApiHelper
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
         ShipfunkDataHelper $shipfunkDataHelper,
-        CustomerHelper $customerHelper,
         \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
         ParcelHelper $parcelHelper,
         QuoteFactory $quoteFactory,
         OrderFactory $orderFactory,
         ShippingFactory $shippingFactory
     ) {
-        parent::__construct($logger, $shipfunkDataHelper, $customerHelper, $httpClientFactory);
+        parent::__construct($logger, $shipfunkDataHelper, $httpClientFactory);
 
         $this->parcelHelper = $parcelHelper;
         $this->quoteFactory = $quoteFactory;

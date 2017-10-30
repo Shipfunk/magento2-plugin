@@ -5,7 +5,6 @@ namespace Nord\Shipfunk\Model\Api\Shipfunk;
 use Magento\Shipping\Model\Tracking\ResultFactory;
 use Magento\Shipping\Model\Tracking\Result\ErrorFactory;
 use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\CustomerHelper;
 use Magento\Framework\HTTP\ZendClientFactory;
 use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
 use Magento\Framework\View\Element\Template\Context;
@@ -45,7 +44,6 @@ class GetTrackingEvents extends AbstractApiHelper implements LoggerAwareInterfac
      *
      * @param Context            $context
      * @param ShipfunkDataHelper $shipfunkDataHelper
-     * @param CustomerHelper     $customerHelper
      * @param ErrorFactory       $trackErrorFactory
      * @param StatusFactory      $trackStatusFactory
      * @param ResultFactory      $trackFactory
@@ -53,13 +51,12 @@ class GetTrackingEvents extends AbstractApiHelper implements LoggerAwareInterfac
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
         ShipfunkDataHelper $shipfunkDataHelper,
-        CustomerHelper $customerHelper,
         \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
         ErrorFactory $trackErrorFactory,
         StatusFactory $trackStatusFactory,
         ResultFactory $trackFactory
     ) {
-        parent::__construct($logger, $shipfunkDataHelper, $customerHelper, $httpClientFactory);
+        parent::__construct($logger, $shipfunkDataHelper, $httpClientFactory);
 
         $this->trackErrorFactory  = $trackErrorFactory;
         $this->trackStatusFactory = $trackStatusFactory;

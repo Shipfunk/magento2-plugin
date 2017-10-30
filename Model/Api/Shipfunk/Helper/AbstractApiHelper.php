@@ -94,11 +94,6 @@ class AbstractApiHelper extends \Magento\Framework\DataObject
     protected $request;
 
     /**
-     * @var CustomerHelper
-     */
-    protected $customerHelper;
-
-    /**
      * @var LoggerInterface
      */
     protected $log;
@@ -193,16 +188,13 @@ class AbstractApiHelper extends \Magento\Framework\DataObject
      *
      * @param Context            $context
      * @param ShipfunkDataHelper $shipfunkDataHelper
-     * @param CustomerHelper     $customerHelper
      * @param \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory
      */
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
         ShipfunkDataHelper $shipfunkDataHelper,
-        CustomerHelper $customerHelper,
         \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory
     ) {
-        $this->customerHelper = $customerHelper;
         $this->helper         = $shipfunkDataHelper;
         $this->log            = $logger;
         $this->_httpClientFactory = $httpClientFactory;
@@ -273,26 +265,6 @@ class AbstractApiHelper extends \Magento\Framework\DataObject
       
       
         // return $this->helper->getConfigData('api_url') . $this->getRoute() . '/' . 'true' . '/' . $this->getRestFormat() . '/' . $this->getOrderId();
-    }
-
-    /**
-     * @return CustomerHelper
-     */
-    public function getCustomerHelper()
-    {
-        return $this->customerHelper;
-    }
-
-    /**
-     * @param CustomerHelper $customerHelper
-     *
-     * @return $this
-     */
-    public function setCustomerHelper($customerHelper)
-    {
-        $this->customerHelper = $customerHelper;
-
-        return $this;
     }
 
     /**
@@ -745,11 +717,6 @@ class AbstractApiHelper extends \Magento\Framework\DataObject
      */
     public function getCustomer()
     {
-        //$customerHelper = $this->getCustomerHelper();
-
-        //$customerHelper->setOrderData($this->getOrder());
-        //$customerHelper->setRequest($this->getRequest());
-
         /** @noinspection PhpUndefinedMethodInspection */
         $customer = [
             'customer' => [
