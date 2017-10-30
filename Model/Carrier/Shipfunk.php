@@ -421,9 +421,10 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         $result = $this->GetDeliveryOptions
             ->setParcels($packedBoxes)
             ->setProducts($this->products)
-            ->setOrder($request->getAllItems()[0]->getQuote())
+            //->setOrder($request->getAllItems()[0]->getQuote())
             ->setRequest($request)
-            ->getResult();
+            ->execute();
+            //->getResult();
 
 
         return json_decode($result->getBody());

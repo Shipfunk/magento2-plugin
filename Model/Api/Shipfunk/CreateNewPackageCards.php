@@ -11,6 +11,11 @@ use Magento\Framework\DataObject;
  */
 class CreateNewPackageCards extends AbstractEndpoint
 {
+    public function execute()
+    {
+      
+    }
+  
     /**
      * @return string
      */

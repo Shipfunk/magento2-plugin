@@ -15,7 +15,8 @@
                 <model>Nord\Shipfunk\Model\Carrier\Shipfunk</model>
                 <name>Fixed</name>
                 <debug>1</debug>
-                <test_api_key>0:2:PhbaTVk9R5mp2y0b3p3WuDfLhBjB6YEM:SVVlhYVbdaakisPtWB+loKmw7VrnDSHcmeFetUIMB6o=</test_api_key>
+                <live_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <test_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted">0:2:PhbaTVk9R5mp2y0b3p3WuDfLhBjB6YEM:SVVlhYVbdaakisPtWB+loKmw7VrnDSHcmeFetUIMB6o=</test_api_key>
                 <test_mode>1</test_mode>
                 <api_url>https://shipfunkservices.com/api/1.2/</api_url>
                 <shipfunk_username>Your Shipfunk username</shipfunk_username>

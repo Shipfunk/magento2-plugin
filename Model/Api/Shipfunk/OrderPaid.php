@@ -9,6 +9,11 @@ namespace Nord\Shipfunk\Model\Api\Shipfunk;
  */
 class OrderPaid extends AbstractEndpoint
 {
+    public function execute()
+    {
+      
+    }
+
     /**
      * @return string
      */

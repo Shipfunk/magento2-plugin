@@ -61,6 +61,11 @@ class GetTrackingEvents extends AbstractEndpoint implements LoggerAwareInterface
         $this->trackFactory       = $trackFactory;
         $this->logger             = new NullLogger();
     }
+  
+    public function execute()
+    {
+      
+    }
 
     /**
      * @param $trackings

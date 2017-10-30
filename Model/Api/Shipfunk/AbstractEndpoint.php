@@ -2,8 +2,7 @@
 
 namespace Nord\Shipfunk\Model\Api\Shipfunk;
 
-use Magento\Framework\View\Element\Template\Context,
-    SimpleXMLElement,
+use SimpleXMLElement,
     Magento\Framework\HTTP\ZendClient,
     Magento\Framework\HTTP\ZendClientFactory,
     Magento\Quote\Model\Quote,
@@ -31,11 +30,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
      * @var string
      */
     protected $apiUrl;
-
-    /**
-     * @var string
-     */
-    protected $headers;
 
     /**
      * @var string
@@ -120,11 +114,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     /**
      * @var string
      */
-    protected $orderId;
-
-    /**
-     * @var string
-     */
     protected $cardDirection;
 
     /**
@@ -183,9 +172,9 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     protected $_httpClientFactory;
   
     /**
-     * AbstractApiHelper constructor.
+     * AbstractEndpoint constructor.
      *
-     * @param Context            $context
+     * @param LoggerInterface $logger
      * @param ShipfunkDataHelper $shipfunkDataHelper
      * @param \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory
      */
@@ -198,11 +187,23 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
         $this->log            = $logger;
         $this->_httpClientFactory = $httpClientFactory;
 
+        $this->setHeaders([
+          'Accept' => 'application/json',
+          'Authorization' => $this->helper->getConfigData('test_mode') ? $this->helper->getConfigData('test_api_key') : $this->helper->getConfigData('live_api_key')
+        ]);
+      
         $this->setLogin(
             $this->helper->getConfigData('shipfunk_username'),
             $this->helper->getConfigData('shipfunk_password')
         );
     }
+  
+    /**
+     * Execute the Shipfunk API endpoint call and return the result
+     *
+     * @return \Zend_Http_Response
+     */
+    abstract public function execute();
 
     /**
      * @param string $id
@@ -255,15 +256,17 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
      */
     public function getApiUrl($includeWebshopId = false)
     {
+        // v.1.2
+        if ($this->getEndpoint()) {
+          return $this->helper->getConfigData('api_url') . $this->getEndpoint() .  '/' . 'true' . $this->getRestFormat() . '/' . $this->getOrderId();
+        }
+      
         $environmentUrl = $this->helper->getConfigData('shipfunk_url');
         if ($includeWebshopId) {
             return $environmentUrl.$this->getRoute()."/".$this->getWebshopId().$this->getRestFormat();
         }
 
-        return $environmentUrl.$this->getRoute().$this->getRestFormat();
-      
-      
-        // return $this->helper->getConfigData('api_url') . $this->getRoute() . '/' . 'true' . '/' . $this->getRestFormat() . '/' . $this->getOrderId();
+        return $environmentUrl.$this->getRoute().$this->getRestFormat();            
     }
 
     /**
@@ -465,15 +468,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     /**
      * @return string
      */
-    public function getHeaders()
-    {
-        return ['Accept' => 'application/json'];
-
-    }
-
-    /**
-     * @return string
-     */
     public function getQuoteId()
     {
         return $this->quoteId;
@@ -487,26 +481,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     public function setQuoteId($quoteId)
     {
         $this->quoteId = $quoteId;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOrderId()
-    {
-        return $this->orderId;
-    }
-
-    /**
-     * @param string $orderId
-     *
-     * @return $this
-     */
-    public function setOrderId($orderId)
-    {
-        $this->orderId = $orderId;
 
         return $this;
     }
@@ -793,6 +767,8 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
         $client->setConfig(['maxredirects' => 0, 'timeout' => 30]);
         $client->setHeaders($this->getHeaders());
         $client->setParameterPost($data);
+        $this->log->debug(var_export($this->getHeaders(), true));
+        $this->log->debug(var_export($this->getApiUrl($transmitWebshopId), true));
         $result = $client->request(\Magento\Framework\HTTP\ZendClient::POST);
       
         return $result;
