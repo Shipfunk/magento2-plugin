@@ -28,7 +28,7 @@
                 <shipfunk_package_card_size>A4</shipfunk_package_card_size>
 
                 <title>Shipfunk Shipping</title>
-                <sallowspecific>1</sallowspecific>
+                <sallowspecific>0</sallowspecific>
                 <specificcountry>FI</specificcountry>
                 <showmethod>0</showmethod>
                 <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.
@@ -37,14 +37,12 @@
                 <weight_mapping>weight</weight_mapping>
                 <weight_unit>kg</weight_unit>
                 <weight_default>1</weight_default>
-                <length_mapping>shipfunk_length</length_mapping>
-                <length_unit>cm</length_unit>
-                <length_default>1</length_default>
+                <dimensions_unit>cm</dimensions_unit>
+                <height_mapping>shipfunk_length</height_mapping>
+                <height_default>1</height_default>
                 <width_mapping>shipfunk_width</width_mapping>
-                <width_unit>cm</width_unit>
                 <width_default>1</width_default>
                 <depth_mapping>shipfunk_depth</depth_mapping>
-                <depth_unit>cm</depth_unit>
                 <depth_default>1</depth_default>
                 <max_package_weight>9999</max_package_weight>
 

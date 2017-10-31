@@ -86,32 +86,27 @@
                     <label>Default Product Weight</label>
                     <comment>Use this if no value can be found in Weight-Field</comment>
                 </field>
-                <field id="length_mapping" translate="label" type="select" sortOrder="130" showInDefault="1"
+                <field id="dimensions_unit" translate="label" type="select" sortOrder="130" showInDefault="1"
                        showInWebsite="1" showInStore="0" canRestore="1">
-                    <label>Length Attribute</label>
+                    <label>Dimensions Unit</label>
+                    <source_model>Nord\Shipfunk\Model\Config\Source\DimensionsUnits</source_model>
+                </field>
+                <field id="height_mapping" translate="label" type="select" sortOrder="140" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Height Attribute</label>
                     <source_model>Nord\Shipfunk\Model\Config\Source\ProductAttributes</source_model>
                 </field>
-                <field id="length_unit" translate="label" type="select" sortOrder="140" showInDefault="1"
-                       showInWebsite="1" showInStore="0" canRestore="1">
-                    <label>Length Unit</label>
-                    <source_model>Nord\Shipfunk\Model\Config\Source\LengthUnits</source_model>
-                </field>
-                <field id="length_default" translate="label" type="text" sortOrder="150" showInDefault="1"
+                <field id="height_default" translate="label" type="text" sortOrder="150" showInDefault="1"
                        showInWebsite="1"
                        showInStore="0"
                        canRestore="1">
-                    <label>Default Product Length</label>
+                    <label>Default Product Height</label>
                     <comment>Use this if no value can be found in Length-Field</comment>
                 </field>
                 <field id="width_mapping" translate="label" type="select" sortOrder="160" showInDefault="1"
                        showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Width Attribute</label>
                     <source_model>Nord\Shipfunk\Model\Config\Source\ProductAttributes</source_model>
-                </field>
-                <field id="width_unit" translate="label" type="select" sortOrder="170" showInDefault="1"
-                       showInWebsite="1" showInStore="0" canRestore="1">
-                    <label>Width Unit</label>
-                    <source_model>Nord\Shipfunk\Model\Config\Source\LengthUnits</source_model>
                 </field>
                 <field id="width_default" translate="label" type="text" sortOrder="180" showInDefault="1"
                        showInWebsite="1"
@@ -124,11 +119,6 @@
                        showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Depth Field</label>
                     <source_model>Nord\Shipfunk\Model\Config\Source\ProductAttributes</source_model>
-                </field>
-                <field id="depth_unit" translate="label" type="select" sortOrder="200" showInDefault="1"
-                       showInWebsite="1" showInStore="0" canRestore="1">
-                    <label>Depth Unit</label>
-                    <source_model>Nord\Shipfunk\Model\Config\Source\LengthUnits</source_model>
                 </field>
                 <field id="depth_default" translate="label" type="text" sortOrder="210" showInDefault="1"
                        showInWebsite="1"

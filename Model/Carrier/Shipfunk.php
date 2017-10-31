@@ -101,16 +101,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     protected $unitConverter;
 
     /**
-     * @var mixed
-     */
-    protected $product;
-
-    /**
-     * @var array
-     */
-    protected $products;
-
-    /**
      * @var ShipfunkPacker
      */
     protected $packer;
@@ -335,15 +325,14 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
             return false;
         }
 
-        $this->setRateRequest($request);
-
         $result = $this->_rateFactory->create();
-        // SHIPFUNK REQUIRES AN ADDRESS, BUT MAGE DOESN'T INCLUDE STREET ADDRESS IN SHIPPING REQUEST BY DEFAULT
-        if (!$request->getDestStreet()) {
-            return $result;
-        }
+        $products = $this->parcelHelper->parseProducts($request);
+        $shipfunkResponse = $this->GetDeliveryOptions
+                                ->setProducts($products)
+                                ->setRequest($request)
+                                ->execute();
 
-        $shippingMethods = $this->getShipfunkShippingMethods();
+        $shippingMethods = json_decode($shipfunkResponse->getBody());
 
         /**
          * if ($shippingMethods->Error) {
@@ -363,7 +352,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
          */
 
         $this->_debug($shippingMethods);
-        // NEEDS TO BE FIXED, SAVES ALL methods in quote_shipping_rate table, INSTEAD only selected one
         //$this->getSession()->getQuote()->setExtShippingInfo(json_encode($shippingMethods->response));
         //$this->getSession()->getQuote()->save();
         if (isset($shippingMethods->Error)) {
@@ -375,7 +363,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
                     $method = $this->_rateMethodFactory->create();
                     $method->setCarrier('shipfunk');
                     $method->setMethod(
-                        $carrier->Carriercode.'_'.$carrierOption->carriercode.'_'.$carrierOption->productcode
+                        $carrier->Carriercode.'_'.$carrierOption->carriercode // .'_'.$carrierOption->productcode
                     );
                     // not visible anywhere but saved in database quote_shipping_rate
                     // to add it on frontend needs plugin on Magento\Quote\Model\Cart\ShippingMethodConverter::modelToDataObject  and possibly extension_attribute for Magento\Quote\Api\Data\ShippingMethodInterface
@@ -385,8 +373,8 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
                     );
                     $method->setCarrierTitle($carrier->Companyname);
                     $method->setMethodTitle($carrierOption->productname);
-                    $method->setPrice($carrierOption->discounted_price);
-                    $method->setCost($carrierOption->realprice);
+                    $method->setPrice($carrierOption->customer_price);
+                    $method->setCost($carrierOption->calculated_price);
                     $result->append($method);
                 }
             }
@@ -405,29 +393,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         }
 
         return parent::isActive();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getShipfunkShippingMethods()
-    {
-        $request = $this->getRateRequest();
-        $items = $request->getAllItems();
-
-        $packedBoxes = $this->parcelHelper->packWithBoxPacker($items, $request);
-
-        /** @noinspection PhpUndefinedMethodInspection */
-        $result = $this->GetDeliveryOptions
-            ->setParcels($packedBoxes)
-            ->setProducts($this->products)
-            //->setOrder($request->getAllItems()[0]->getQuote())
-            ->setRequest($request)
-            ->execute();
-            //->getResult();
-
-
-        return json_decode($result->getBody());
     }
 
     /**

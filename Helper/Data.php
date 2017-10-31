@@ -65,4 +65,13 @@ class Data extends AbstractHelper
             $this->_storeResolver->getCurrentStoreId()
         );
     }
+  
+    public function getGlobalWeightUnit()
+    {
+        return $this->scopeConfig->getValue(
+            'general/locale/weight_unit',
+            ScopeInterface::SCOPE_STORE,
+            $this->_storeResolver->getCurrentStoreId()
+        );
+    }
 }

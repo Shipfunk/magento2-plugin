@@ -11,6 +11,7 @@ use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Magento\Framework\Locale\Resolver;
 
 /**
  * Class GetTrackingEvents
@@ -50,11 +51,12 @@ class GetTrackingEvents extends AbstractEndpoint implements LoggerAwareInterface
         \Psr\Log\LoggerInterface $logger,
         ShipfunkDataHelper $shipfunkDataHelper,
         \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
+        \Magento\Framework\Locale\Resolver $localeResolver,
         ErrorFactory $trackErrorFactory,
         StatusFactory $trackStatusFactory,
         ResultFactory $trackFactory
     ) {
-        parent::__construct($logger, $shipfunkDataHelper, $httpClientFactory);
+        parent::__construct($logger, $shipfunkDataHelper, $httpClientFactory, $localeResolver);
 
         $this->trackErrorFactory  = $trackErrorFactory;
         $this->trackStatusFactory = $trackStatusFactory;

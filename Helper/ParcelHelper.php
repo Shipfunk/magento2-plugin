@@ -3,6 +3,7 @@
 namespace Nord\Shipfunk\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Nord\Shipfunk\Helper\UnitConverter;
 use Nord\Shipfunk\Model\BoxPacker\Box;
@@ -20,96 +21,6 @@ use Nord\Shipfunk\Model\BoxPacker\ShipfunkPacker;
  */
 class ParcelHelper extends AbstractHelper
 {
-    /**
-     * @var string
-     */
-    protected $dimens;
-
-    /**
-     * @var string
-     */
-    protected $warehouse;
-
-    /**
-     * @var string
-     */
-    protected $contents;
-
-    /**
-     * @var string
-     */
-    protected $parcelCode;
-
-    /**
-     * @var string
-     */
-    protected $weight;
-
-    /**
-     * @var string
-     */
-    protected $value;
-
-    /**
-     * @var string
-     */
-    protected $oldRemoval = 0;
-
-    /**
-     * @var string
-     */
-    protected $installation = 0;
-
-    /**
-     * @var string
-     */
-    protected $fragile = 0;
-
-    /**
-     * @var string
-     */
-    protected $vakCode = 0;
-
-    /**
-     * @var string
-     */
-    protected $vakDescription = 0;
-
-    /**
-     * @var string
-     */
-    protected $vakWeight = '0.0';
-
-    /**
-     * @var int
-     */
-    protected $stackable = 0;
-
-    /**
-     * @var int
-     */
-    protected $toppleable = 0;
-
-    /**
-     * @var string
-     */
-    protected $tracking_code;
-
-    /**
-     * @var string
-     */
-    protected $tracking_code_return;
-
-    /**
-     * @var mixed
-     */
-    protected $product;
-
-    /**
-     * @var array
-     */
-    protected $products;
-
     /**
      * @var UnitConverter
      */
@@ -129,31 +40,22 @@ class ParcelHelper extends AbstractHelper
     /**
      * ParcelHelper constructor.
      *
+     * @param \Magento\Framework\App\Helper\Context $context
      * @param ShipfunkPacker $packer
      * @param UnitConverter $unitConverter
      * @param ShipfunkDataHelper $shipfunkDataHelper
      */
     public function __construct(
+        Context $context,
         ShipfunkPacker $packer,
         UnitConverter $unitConverter,
         ShipfunkDataHelper $shipfunkDataHelper
     ) {
+        parent::__construct($context);
         $this->packer = $packer;
         $this->unitConverter = $unitConverter;
         $this->helper = $shipfunkDataHelper;
 
-    }
-
-    /**
-     * @param mixed $product
-     *
-     * @return ParcelHelper
-     */
-    public function setProduct($product)
-    {
-        $this->product = $product;
-
-        return $this;
     }
 
     /**
@@ -182,326 +84,6 @@ class ParcelHelper extends AbstractHelper
     }
 
     /**
-     * @return string
-     */
-    public function getContents()
-    {
-        return $this->contents;
-    }
-
-    /**
-     * @param string $contents
-     *
-     * @return $this
-     */
-    public function setContents($contents)
-    {
-        $this->contents = $contents;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getParcelCode()
-    {
-        return $this->parcelCode;
-    }
-
-    /**
-     * @param string $parcelCode
-     *
-     * @return $this
-     */
-    public function setParcelCode($parcelCode)
-    {
-        $this->parcelCode = $parcelCode;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWeight()
-    {
-        return $this->weight;
-    }
-
-    /**
-     * @param string $weight
-     *
-     * @return $this
-     */
-    public function setWeight($weight)
-    {
-        $this->weight = $weight;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function setValue($value)
-    {
-        $this->value = $value;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOldRemoval()
-    {
-        return $this->oldRemoval;
-    }
-
-    /**
-     * @param string $oldRemoval
-     *
-     * @return $this
-     */
-    public function setOldRemoval($oldRemoval)
-    {
-        $this->oldRemoval = $oldRemoval;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getInstallation()
-    {
-        return $this->installation;
-    }
-
-    /**
-     * @param int $installation
-     *
-     * @return $this
-     */
-    public function setInstallation($installation)
-    {
-        $this->installation = $installation;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getFragile()
-    {
-        return $this->fragile;
-    }
-
-    /**
-     * @param int $fragile
-     *
-     * @return $this
-     */
-    public function setFragile($fragile)
-    {
-        $this->fragile = $fragile;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getToppleable()
-    {
-        return $this->toppleable;
-    }
-
-    /**
-     * @param int $toppleable
-     *
-     * @return $this
-     */
-    public function setToppleable($toppleable)
-    {
-        $this->toppleable = $toppleable;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getStackable()
-    {
-        return $this->stackable;
-    }
-
-    /**
-     * @param int $stackable
-     *
-     * @return $this
-     */
-    public function setStackable($stackable)
-    {
-        $this->stackable = $stackable;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getVakCode()
-    {
-        return $this->vakCode;
-    }
-
-    /**
-     * @param string $vakCode
-     *
-     * @return $this
-     */
-    public function setVakCode($vakCode)
-    {
-        $this->vakCode = $vakCode;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getVakDescription()
-    {
-        return $this->vakDescription;
-    }
-
-    /**
-     * @param string $vakDescription
-     *
-     * @return $this
-     */
-    public function setVakDescription($vakDescription)
-    {
-        $this->vakDescription = $vakDescription;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getVakWeight()
-    {
-        return $this->vakWeight;
-    }
-
-    /**
-     * @param string $vakWeight
-     *
-     * @return $this
-     */
-    public function setVakWeight($vakWeight)
-    {
-        $this->vakWeight = $vakWeight;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDimens()
-    {
-        return $this->dimens;
-    }
-
-    /**
-     * @param $dimens
-     *
-     * @return $this
-     */
-    public function setDimens($dimens)
-    {
-        $this->dimens = $dimens;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWarehouse()
-    {
-        return $this->warehouse;
-    }
-
-    /**
-     * @param string $warehouse
-     *
-     * @return $this
-     */
-    public function setWarehouse($warehouse)
-    {
-        $this->warehouse = $warehouse;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTrackingCode()
-    {
-        return $this->tracking_code;
-    }
-
-    /**
-     * @param $tracking_code
-     *
-     * @return $this
-     */
-    public function setTrackingCode($tracking_code)
-    {
-        $this->tracking_code = $tracking_code;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTrackingCodeReturn()
-    {
-        return $this->tracking_code_return;
-    }
-
-    /**
-     * @param $tracking_code_return
-     *
-     * @return $this
-     */
-    public function setTrackingCodeReturn($tracking_code_return)
-    {
-        $this->tracking_code_return = $tracking_code_return;
-
-        return $this;
-    }
-
-    /**
      * @param                         $items
      * @param RateRequest|DataObject $request
      *
@@ -522,18 +104,8 @@ class ParcelHelper extends AbstractHelper
             }
 
             /** @noinspection PhpUndefinedMethodInspection */
-            if ($cartItem->getHasChildren() && $cartItem->isShipSeparately()) {
-                foreach ($cartItem->getChildren() as $child) {
-                    if ($child->getProduct()->isVirtual()) {
-                        $request->setPackageValue($request->getPackageValue() - $child->getBaseRowTotal());
-                    }
-                }
-            } elseif ($cartItem->getProduct()->isVirtual()) {
-                $request->setPackageValue($request->getPackageValue() - $cartItem->getBaseRowTotal());
-            } else {
-
+            if (!$cartItem->getProduct()->isVirtual()) {
                 $this->product = $cartItem->getProduct();
-
                 $item = new Item(
                     $this->product->getData('name').'/'.$this->product->getData('sku'),
                     $this->getProductWidth(),
@@ -558,55 +130,51 @@ class ParcelHelper extends AbstractHelper
 
         return $convertedBoxes;
     }
-
-    /**
-     * @return mixed
+    
+    /*
+     * @param RateRequest $request
+     * @return array
      */
-    public function getProductWidth()
+    public function parseProducts($request)
     {
-        $widthAttribute = $this->product->getCustomAttribute('shipfunk_width');
-
-        /** @noinspection PhpUndefinedMethodInspection */
-        $value = $widthAttribute ? $widthAttribute->getValue() : $this->helper->getConfigData('width_default');
-
-        return $this->unitConverter->from($value, $this->helper->getConfigData('width_unit'))->to('cm');
+        $products = [];
+        foreach ($request->getAllItems() as $item) {
+            // get the info only from child products, since dimensions and weight might be different based on configuration
+            if ($item->getHasChildren()) {
+                continue;
+            }
+            $product = $item->getProduct();
+            if (!$product->isVirtual()) {
+                $products[] = [
+                    'amount' => $item->getQty(),
+                    'code' => $product->getSku(),
+                    'name' => $product->getName(),
+                    'weight'     => [
+                        'unit'  => $this->helper->getConfigData('weight_unit'),
+                        'amount'  => $this->getProductValue($product, 'weight')
+                    ],
+                    'dimensions'     => [
+                        'unit' => $this->helper->getConfigData('dimensions_unit'),
+                        'width' => $this->getProductValue($product, 'width'),
+                        'depth' => $this->getProductValue($product, 'depth'),
+                        'height' => $this->getProductValue($product, 'height')
+                    ]
+                ];
+            }
+        }
+      
+        return $products;
     }
 
     /**
      * @return mixed
      */
-    public function getProductLength()
+    public function getProductValue($product, $attribute)
     {
-        $lengthAttribute = $this->product->getCustomAttribute('shipfunk_length');
-        /** @noinspection PhpUndefinedMethodInspection */
-        $value = $lengthAttribute ? $lengthAttribute->getValue() : $this->helper->getConfigData('length_default');
-
-        return $this->unitConverter->from($value, $this->helper->getConfigData('length_unit'))->to('cm');
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getProductDepth()
-    {
-        $depthAttribute = $this->product->getCustomAttribute('shipfunk_depth');
-
-        /** @noinspection PhpUndefinedMethodInspection */
-        $value = $depthAttribute ? $depthAttribute->getValue() : $this->helper->getConfigData('depth_default');
-
-        return $this->unitConverter->from($value, $this->helper->getConfigData('depth_unit'))->to('cm');
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getProductWeight()
-    {
-        $productValue = $this->product->getData('weight');
-
-        $value = $productValue ? $productValue : $this->helper->getConfigData('weight_default');
-
-        return $this->unitConverter->from($value, $this->helper->getConfigData('weight_unit'))->to('kg');
+        $mageAttribute = $this->helper->getConfigData($attribute . '_mapping');
+        $attributeValue = $product->getData($mageAttribute);  // @todo VALUE IS NOT BEING PASSED HERE
+        $value = is_numeric($attributeValue) && $attributeValue ? $attributeValue : $this->helper->getConfigData($attribute . '_default');
+        return $value;
     }
 
     /**

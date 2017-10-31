@@ -5,11 +5,11 @@ namespace Nord\Shipfunk\Model\Config\Source;
 use Magento\Framework\Option\ArrayInterface;
 
 /**
- * Class LengthUnits
+ * Class DimensionsUnits
  *
  * @package Nord\Shipfunk\Model\Config\Source
  */
-class LengthUnits implements ArrayInterface
+class DimensionsUnits implements ArrayInterface
 {
     /**
      * @return array

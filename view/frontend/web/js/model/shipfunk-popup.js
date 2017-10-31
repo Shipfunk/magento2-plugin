@@ -75,12 +75,29 @@ define(
                 var sf_returntype = "json";
                 var sf_thisorderid = window.checkoutConfig.quoteItemData[0].quote_id;
                 var sf_webshopid = window.shipfunkPopup.webshopid;
-                var sf_language_code = "EN";
+                var sf_language_code = "EN"; // @todo THIS SHOULD BE CURRENT INTERFACE LANGUAGE
                 var sf_country = address.countryId ? address.countryId : address.country_id;
+                var sf_data = {
+                  "query": {
+                    "webshop": {
+                      "api_key": window.shipfunkPopup.apiKey
+                    },
+                    "order": {
+                      "carriercode": methodCodeArray[1],
+                      "language": sf_language_code,
+                      "return_count": 5
+                    },
+                    "customer": {
+                      "postal_code": address.postcode,
+                      "country": sf_country
+                    }
+                  }
+                };
                 $.ajax({
                     type: "GET",
-                    url: window.shipfunkPopup.apiUrl + "getpickups/" + methodCodeArray[1] + "/" + address.postcode + "/" + sf_returntype + "/" + sf_webshopid + "/" + sf_thisorderid + "/" + sf_country + "/" + sf_language_code,
+                    url: window.shipfunkPopup.apiUrl + "get_pickups/true/json/json/" + sf_thisorderid, //+ methodCodeArray[1] + "/" + address.postcode + "/" + sf_returntype + "/" + sf_webshopid + "/" + sf_thisorderid + "/" + sf_country + "/" + sf_language_code,
                     timeout: 5000, // 5 second timeout in millis!
+                    data: { 'sf_get_pickups': JSON.stringify(sf_data) },
                     dataType: "jsonp",
                     success: function (data, textStatus, jqXHR) {
 
@@ -92,7 +109,6 @@ define(
                         if (response !== undefined && response.length) {
                             self.showModal();
                             // display only 1st 5 points
-                            response = response.slice(0, 15);
                             shippingPoints(response);
                         }
                         else {

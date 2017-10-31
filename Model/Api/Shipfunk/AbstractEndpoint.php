@@ -8,6 +8,7 @@ use SimpleXMLElement,
     Magento\Quote\Model\Quote,
     DVDoug\BoxPacker\PackedBoxList,
     Psr\Log\LoggerInterface,
+    Magento\Framework\Locale\Resolver,
     Nord\Shipfunk\Helper\Data as ShipfunkDataHelper,
     Magento\Sales\Model\Order,
     Magento\Framework\DataObject;
@@ -25,11 +26,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
      * @var string
      */
     protected $_code = 'shipfunk';
-
-    /**
-     * @var string
-     */
-    protected $apiUrl;
 
     /**
      * @var string
@@ -67,11 +63,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     protected $args;
 
     /**
-     * @var array
-     */
-    protected $products;
-
-    /**
      * @var Quote
      */
     protected $order;
@@ -82,11 +73,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     protected $orderShipment;
 
     /**
-     * @var Quote\Address\RateRequest
-     */
-    protected $request;
-
-    /**
      * @var LoggerInterface
      */
     protected $log;
@@ -95,11 +81,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
      * @var string
      */
     protected $fieldname;
-
-    /**
-     * @var array
-     */
-    protected $parcels;
 
     /**
      * @var ShipfunkDataHelper
@@ -125,11 +106,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
      * @var string
      */
     protected $dpi;
-
-    /**
-     * @var string
-     */
-    protected $size;
 
     /**
      * @var string
@@ -172,6 +148,11 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     protected $_httpClientFactory;
   
     /**
+     * @var \Magento\Framework\Locale\Resolver
+     */
+    protected $_localeResolver;
+  
+    /**
      * AbstractEndpoint constructor.
      *
      * @param LoggerInterface $logger
@@ -181,12 +162,14 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
         ShipfunkDataHelper $shipfunkDataHelper,
-        \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory
+        \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
+        \Magento\Framework\Locale\Resolver $localeResolver
     ) {
         $this->helper         = $shipfunkDataHelper;
         $this->log            = $logger;
         $this->_httpClientFactory = $httpClientFactory;
-
+        $this->_localeResolver = $localeResolver;
+      
         $this->setHeaders([
           'Accept' => 'application/json',
           'Authorization' => $this->helper->getConfigData('test_mode') ? $this->helper->getConfigData('test_api_key') : $this->helper->getConfigData('live_api_key')
@@ -343,26 +326,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     }
 
     /**
-     * @param Quote\Address\RateRequest|DataObject|Request $request
-     *
-     * @return $this
-     */
-    public function setRequest($request)
-    {
-        $this->request = $request;
-
-        return $this;
-    }
-
-    /**
-     * @return Quote\Address\RateRequest|DataObject|Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
      * @return PackedBoxList
      */
     public function getBoxes()
@@ -398,49 +361,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     public function setOrderShipment($orderShipment)
     {
         $this->orderShipment = $orderShipment;
-
-        return $this;
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getProducts()
-    {
-        return $this->products;
-    }
-
-    /**
-     * @param array $products
-     *
-     * @return $this
-     */
-    public function setProducts($products)
-    {
-        $this->products = $products;
-
-        return $this;
-    }
-
-
-
-    /**
-     * @return array
-     */
-    public function getParcels()
-    {
-        return $this->parcels;
-    }
-
-    /**
-     * @param array $parcels
-     *
-     * @return $this
-     */
-    public function setParcels($parcels)
-    {
-        $this->parcels = $parcels;
 
         return $this;
     }
@@ -541,26 +461,6 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     public function setDpi($dpi)
     {
         $this->dpi = $dpi;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSize()
-    {
-        return $this->size;
-    }
-
-    /**
-     * @param string $size
-     *
-     * @return $this
-     */
-    public function setSize($size)
-    {
-        $this->size = $size;
 
         return $this;
     }
@@ -761,7 +661,8 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
      */
     protected function post($xml, $transmitWebshopId = false)
     {
-        $data = ['sf_'.$this->getFieldname() => $xml];
+        $data = [$this->getEndpoint() ? 'sf_' . $this->getEndpoint() : 'sf_' . $this->getFieldname() => $xml];
+        $this->log->debug(var_export($data, true));
         $client = $this->_httpClientFactory->create();
         $client->setUri((string) $this->getApiUrl($transmitWebshopId));
         $client->setConfig(['maxredirects' => 0, 'timeout' => 30]);
@@ -782,7 +683,7 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
      */
     protected function get($xml, $transmitWebshopId = false)
     {
-        $data = ['sf_'.$this->getFieldname() => $xml];
+        $data = ['sf_' . $this->getEndpoint() ? $this->getEndpoint() : $this->getFieldname() => $xml];
       
         $client = $this->_httpClientFactory->create();
         $client->setUri((string) $this->getApiUrl($transmitWebshopId));
