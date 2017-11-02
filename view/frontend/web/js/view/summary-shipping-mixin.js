@@ -1,11 +1,14 @@
 define([
     'jquery',
     'Magento_Checkout/js/model/quote',
+    'Nord_Shipfunk/js/model/shipfunk-popup',
     'Magento_Ui/js/modal/alert',
     'mage/translate'
-], function ($, quote, alert, $t) {
+], function ($, quote, shipfunkPopupModel, alert, $t) {
     'use strict';
 
+    var selectedPoint = shipfunkPopupModel.getSelectedPickup();
+  
     var mixin = {
         getShippingMethodTitle: function () {
             if (!this.isCalculated()) {
@@ -13,30 +16,11 @@ define([
             }
             var shippingMethod = quote.shippingMethod();
             var quoteId = quote.getQuoteId();
-            var data = ['select', true, quoteId, 'true'];
-
-            mixin.createPickupBox();
-
-            $.ajax({
-                type: "POST",
-                url: window.shipfunkPopup.baseUrl + "shipfunk/index/index",
-                timeout: 5000, // 5 second timeout in millis!
-                data: {'data': data},
-                dataType: "json",
-                success: function (data, textStatus, jqXHR) {
-                    if (data) {
-                        mixin.createPickupBox();
-                        $('#pickup').html(data);
-                    }
-                    else {
-                        console.debug('no');
-                        $('#pickupLocation').remove();
-                    }
-                },
-                error: function (jqXHR, textStatus) {
-                    $('#pickupLocation').remove();
-                }
-            });
+            var selected = selectedPoint();
+            //if (selected) {
+                mixin.createPickupBox();
+                $('#pickup').html(selected.pickup_name);
+            //}
 
             return shippingMethod ? shippingMethod.carrier_title + " - " + shippingMethod.method_title : '';
         },

@@ -10,24 +10,6 @@ define(
         return {
             getRules: function () {
                 return {
-                    'email': {
-                        'required': true
-                    },
-                    'firstname': {
-                        'required': true
-                    },
-                    'lastname': {
-                        'required': true
-                    },
-                    'street': {
-                        'required': true
-                    },
-                    'telephone': {
-                        'required': true
-                    },
-                    'city': {
-                        'required': true
-                    },
                     'postcode': {
                         'required': true
                     },
