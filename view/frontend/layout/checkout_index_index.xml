@@ -32,6 +32,19 @@
                                                         </item>
                                                     </item>
                                                 </item>
+                                                <item name="shippingAddress" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="pickup-info" xsi:type="array">
+                                                            <item name="component" xsi:type="string">uiComponent</item>
+                                                            <item name="displayArea" xsi:type="string">pickup-info</item>
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="pickup_info" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Nord_Shipfunk/js/view/shipfunk-pickup</item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                              </item>
                                             </item>
                                         </item>
                                     </item>
@@ -60,11 +73,6 @@
                     </argument>
                 </arguments>
             </block>
-
-            <block class="Nord\Shipfunk\Block\PickupInformation" name="shipfunk-pickup" as="shipfunk-pickup" template="checkout/pickup.phtml" after="co.shipping.form">
-
-            </block>
-
         </referenceContainer>
     </body>
 </page>

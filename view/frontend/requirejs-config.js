@@ -24,6 +24,8 @@ var config = {
     map: {
         "*": {
             "Magento_Checkout/template/shipping.html": "Nord_Shipfunk/template/shipping.html",
+            "Magento_Checkout/template/shipping-address/shipping-method-list": "Nord_Shipfunk/template/shipping-address/shipping-method-list",
+            "Magento_Checkout/template/shipping-address/shipping-method-item": "Nord_Shipfunk/template/shipping-address/shipping-method-item",
             "Magento_Checkout/js/model/shipping-service": "Nord_Shipfunk/js/model/shipping-service-mixin"
         }
     },

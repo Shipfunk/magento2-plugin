@@ -84,7 +84,7 @@ define(
                 var sf_data = {
                   "query": {
                     "webshop": {
-                      "api_key": window.shipfunkPopup.apiKey
+                      "api_key": window.shipfunkPopup.apiKey // @todo DO WE NEED TO ENCRYPT THIS ??
                     },
                     "order": {
                       "carriercode": methodCodeArray[1],
@@ -99,34 +99,26 @@ define(
                 };
                 $.ajax({
                     type: "GET",
-                    url: window.shipfunkPopup.apiUrl + "get_pickups/true/json/json/" + sf_thisorderid, //+ methodCodeArray[1] + "/" + address.postcode + "/" + sf_returntype + "/" + sf_webshopid + "/" + sf_thisorderid + "/" + sf_country + "/" + sf_language_code,
+                    url: window.shipfunkPopup.apiUrl + "get_pickups/true/json/json/" + sf_thisorderid,
                     timeout: 5000, // 5 second timeout in millis!
                     data: { 'sf_get_pickups': JSON.stringify(sf_data) },
                     dataType: "jsonp",
                     success: function (data, textStatus, jqXHR) {
-
                         var resp = $.parseJSON(data);
                         var response = resp.response;
 
-                        // self.storePickupPoints(response); // TEBIN
-
                         if (response !== undefined && response.length) {
                             self.showModal();
-                            // display only 1st 5 points
                             shippingPoints(response);
                         }
                         else {
                             shippingPoints(null);
                             selectedPickup(false);
-                            // self.hideModal();
                         }
                         shippingPoints.valueHasMutated();
-                        $('#shipfunkPickup').html(''); // TEBIN
 
                     }
                 });
-
-                console.debug('done');
             },
           
             selectDelivery: function (point = false) {
@@ -158,7 +150,6 @@ define(
                         if (point) {
                             selectedPickup(point);
                             self.hideModal();
-                            // self.selectPickupPointLocation(point);
                         }
                     },
                     error: function (jqXHR, textStatus) {
@@ -168,20 +159,7 @@ define(
                     }
                 });
             },
-            /*
-            // TEBIN
-            selectPickupPointLocation: function (pickup) {
-
-                var self = this;
-                var data = '<b>Selected Pickup Location</b>' +
-                    '<br />' + pickup.pickup_name + '' +
-                    '<br />' + pickup.pickup_addr + '' +
-                    '<br />' + pickup.pickup_postal + ' ' + pickup.pickup_city;
-                $('#shipfunkPickup').html(data).prependTo('#opc-shipping_method');
-
-                self.hideModal();
-            },
-            */
+           
             getShippingPoints: function () {
                 return shippingPoints;
             },

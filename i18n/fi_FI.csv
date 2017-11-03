@@ -1,4 +1,4 @@
-﻿"Please correct the parent block for this block.","Please correct the parent block for this block."
+"Please correct the parent block for this block.","Please correct the parent block for this block."
 "The shipment has been created.","Lähetys on luotu."
 "Cannot save shipment.","Lähetystä ei voida tallentaa."
 shipfunk_error_7,shipfunk_error_7
@@ -65,6 +65,7 @@ Warehouse,Varasto
 "If enabled, shipping methods will be categorized based on Shipfunk extranet settings","Jos päällä, niin lähetystavat kategorioidaan Shipfunkin Extranet asetuksien mukaan"
 "Must be identical as in Shipfunk extranet","Oltava täysin sama kuin Shipfunkin Extranetissä"
 "Choose pickup location","Valitse noutopiste"
+"Selected Pickup Location","Valittu Pickup-sijainti"
 "You saved the configuration.","Asetukset tallennettu."
 "Send Email","Lähetä sähköposti"
 "Pickup Point","Noutopiste"

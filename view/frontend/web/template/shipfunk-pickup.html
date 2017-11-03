@@ -1,0 +1,13 @@
+<!--Pickup info template-->
+<li id="shipfunk-pickup-info"
+    class="checkout-pickup-info"
+    data-bind="if: selectedPickup"
+    role="presentation">
+    <div id="shipfunkPickup()">
+        <div class="step-title" translate="'Selected Pickup Location'"
+             data-role="title" />
+            <div data-bind="text: selectedPickup().pickup_name"></div>
+            <div data-bind="text: selectedPickup().pickup_addr"></div>
+            <div data-bind="text: selectedPickup().pickup_postal + ' ' + selectedPickup().pickup_city"></div>
+     </div>
+</li>
