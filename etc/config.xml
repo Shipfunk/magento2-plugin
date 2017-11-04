@@ -13,19 +13,14 @@
                 <active>1</active>
                 <is_online>1</is_online>
                 <model>Nord\Shipfunk\Model\Carrier\Shipfunk</model>
-                <name>Fixed</name>
+                <name>Shipfunk</name>
                 <debug>1</debug>
                 <live_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <test_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted">0:2:PhbaTVk9R5mp2y0b3p3WuDfLhBjB6YEM:SVVlhYVbdaakisPtWB+loKmw7VrnDSHcmeFetUIMB6o=</test_api_key>
                 <test_mode>1</test_mode>
                 <api_url>https://shipfunkservices.com/api/1.2/</api_url>
-                <shipfunk_username>Your Shipfunk username</shipfunk_username>
-                <shipfunk_password>Your Shipfunk password</shipfunk_password>
-                <shipfunk_url>https://dev.shipfunkservices.com/api/1.1/</shipfunk_url>
-                <shipfunk_default_warehouse>0</shipfunk_default_warehouse>
-                <shipfunk_sort_by_price>0</shipfunk_sort_by_price>
-                <shipfunk_group_by_category>0</shipfunk_group_by_category>
-                <shipfunk_package_card_size>A4</shipfunk_package_card_size>
+                
+                <max_package_weight>1000</max_package_weight>
 
                 <title>Shipfunk Shipping</title>
                 <sallowspecific>0</sallowspecific>
@@ -38,14 +33,12 @@
                 <weight_unit>kg</weight_unit>
                 <weight_default>1</weight_default>
                 <dimensions_unit>cm</dimensions_unit>
-                <height_mapping>shipfunk_length</height_mapping>
+                <height_mapping>shipfunk_height</height_mapping>
                 <height_default>1</height_default>
                 <width_mapping>shipfunk_width</width_mapping>
                 <width_default>1</width_default>
                 <depth_mapping>shipfunk_depth</depth_mapping>
                 <depth_default>1</depth_default>
-                <max_package_weight>9999</max_package_weight>
-
                 <warehouse>Extranet Warehouse</warehouse>
                 <category_default>Other</category_default>
                 <category_sorting>1</category_sorting>

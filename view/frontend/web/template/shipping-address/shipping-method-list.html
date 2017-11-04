@@ -8,9 +8,11 @@
     <table class="table-checkout-shipping-method">
         <tbody>
             <!--ko foreach: { data: categories(), as: 'cat'}-->
+                <!--ko if: ($parent.categories().length > 1 && cat != 'ZZZZZZ') -->
                 <tr class="row catHeader">
                     <td colspan="6" data-bind="text:cat"></td>
                 </tr>
+                <!-- /ko -->
                 <!-- ko foreach: { data: $parent.rates(), as: 'method'} -->
                     <!--ko if:(method.extension_attributes.category == cat || method.extension_attributes.category == 'DEFAULT'+cat) -->
                         <!--ko template: { name: element.shippingMethodItemTemplate} --><!-- /ko -->

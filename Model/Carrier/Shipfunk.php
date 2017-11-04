@@ -37,7 +37,6 @@ use Nord\Shipfunk\Model\Api\Shipfunk\DeleteParcels;
 use Nord\Shipfunk\Model\Api\Shipfunk\GetDeliveryOptions;
 use Nord\Shipfunk\Model\Api\Shipfunk\GetTrackingEvents;
 use Nord\Shipfunk\Helper\ParcelHelper;
-use Nord\Shipfunk\Model\Api\Shipfunk\OrderPaid;
 use Nord\Shipfunk\Model\BoxPacker\Box;
 use Nord\Shipfunk\Model\BoxPacker\ShipfunkPacker;
 
@@ -76,26 +75,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     protected $_eavAttribute;
 
     /**
-     * @var int
-     */
-    protected $weight;
-
-    /**
-     * @var int
-     */
-    protected $length;
-
-    /**
-     * @var int
-     */
-    protected $width;
-
-    /**
-     * @var int
-     */
-    protected $height;
-
-    /**
      * @var UnitConverter
      */
     protected $unitConverter;
@@ -114,11 +93,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      * @var RateRequest
      */
     protected $rateRequest;
-
-    /**
-     * @var OrderPaid
-     */
-    protected $OrderPaid;
 
     /**
      * @var GetDeliveryOptions
@@ -168,7 +142,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      * @param ProductRepository       $productRepo
      * @param ShipfunkPacker          $packer
      * @param UnitConverter           $unitConverter
-     * @param OrderPaid               $OrderPaid
      * @param GetDeliveryOptions      $GetDeliveryOptions
      * @param CreateNewPackageCards   $CreateNewPackageCards
      * @param ParcelHelper            $parcelHelper
@@ -198,7 +171,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         ProductRepository $productRepo,
         ShipfunkPacker $packer,
         UnitConverter $unitConverter,
-        OrderPaid $OrderPaid,
         GetDeliveryOptions $GetDeliveryOptions,
         CreateNewPackageCards $CreateNewPackageCards,
         ParcelHelper $parcelHelper,
@@ -235,7 +207,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
             $stockRegistry,
             $data
         );
-
+        
         $this->_productRepo = $productRepo;
         $this->_context = $context;
         $this->_state = $state;
@@ -246,7 +218,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         $this->parcelHelper = $parcelHelper;
         $this->shippingMethodExtension = $shippingMethodExtension;
 
-        $this->OrderPaid = $OrderPaid;
         $this->GetDeliveryOptions = $GetDeliveryOptions;
         $this->CreateNewPackageCards = $CreateNewPackageCards;
         $this->DeleteParcels = $DeleteParcels;
@@ -321,6 +292,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      */
     public function collectRates(RateRequest $request)
     {
+        $this->_logger->debug(var_export('TEST2', true));
         if (!$this->isActive()) {
             return false;
         }

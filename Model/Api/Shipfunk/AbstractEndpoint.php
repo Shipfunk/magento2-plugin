@@ -176,7 +176,7 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
         ]);
       
         $this->setLogin(
-            $this->helper->getConfigData('shipfunk_username'),
+            '',
             $this->helper->getConfigData('shipfunk_password')
         );
     }

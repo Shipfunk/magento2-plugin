@@ -37,15 +37,9 @@ class InstallData implements InstallDataInterface
      */
     public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
-
         $productSetup = $this->productAttributesSetupFactory->create(['setup' => $setup]);
-
         $setup->startSetup();
-
         $productSetup->installProductAttributes();
-
-        $tableName = 'nord_shipfunk_pickups';
-
         $setup->endSetup();
     }
 }

@@ -31,27 +31,6 @@
                     <label>Test API Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
-                <field id="shipfunk_username" translate="label" type="text" sortOrder="10" showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="0"
-                       canRestore="1">
-                    <label>Shipfunk Username</label>
-                </field>
-                <field id="shipfunk_password" translate="label" type="text" sortOrder="20" showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="0"
-                       canRestore="1">
-                    <label>Shipfunk Password</label>
-                </field>
-                <field id="shipfunk_url" translate="label" type="select" sortOrder="30" showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="0"
-                       canRestore="1">
-                    <label>Dev Environment</label>
-                    <source_model>Nord\Shipfunk\Model\Config\Source\Environment</source_model>
-                </field>
-
-
                 <field id="title" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
                        showInStore="1" canRestore="1">
                     <label>Title</label>
@@ -68,7 +47,6 @@
                     <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
                     <can_be_empty>1</can_be_empty>
                 </field>
-
                 <field id="weight_mapping" translate="label" type="select" sortOrder="100" showInDefault="1"
                        showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Weight Attribute</label>
@@ -101,7 +79,7 @@
                        showInStore="0"
                        canRestore="1">
                     <label>Default Product Height</label>
-                    <comment>Use this if no value can be found in Length-Field</comment>
+                    <comment>Use this if no value can be found in Height-Field</comment>
                 </field>
                 <field id="width_mapping" translate="label" type="select" sortOrder="160" showInDefault="1"
                        showInWebsite="1" showInStore="0" canRestore="1">
@@ -140,7 +118,6 @@
                     <comment>If enabled, shipping methods will be categorized based on Shipfunk extranet settings</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-
                 <field id="warehouse" translate="label" type="text" sortOrder="220" showInDefault="1"
                        showInWebsite="1"
                        showInStore="0"
