@@ -2,9 +2,9 @@
 
 namespace Nord\Shipfunk\Model\Api;
 
-use Nord\Shipfunk\Model\Api\Shipfunk\GetPickups;
+use Nord\Shipfunk\Model\Api\Shipfunk\SelectedDelivery;
 
-class GetPickupPointsManagement implements \Nord\Shipfunk\Api\GetPickupPointsManagementInterface
+class SelectedDeliveryManagement implements \Nord\Shipfunk\Api\SelectedDeliveryManagementInterface
 {
     /**
      * @var \Magento\Quote\Model\QuoteIdMaskFactory
@@ -17,37 +17,37 @@ class GetPickupPointsManagement implements \Nord\Shipfunk\Api\GetPickupPointsMan
     protected $shipfunkResponseFactory;
   
     /**
-     * @var GetPickups
+     * @var SelectedDelivery
      */
-    protected $getPickupsClient;
+    protected $selectedDeliveryClient;
 
     /**
      * @param \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory
      * @param \Nord\Shipfunk\Model\Api\ShipfunkResponseFactory $shipfunkResponseFactory
-     * @param \Nord\Shipfunk\Model\Api\Shipfunk\GetPickups $getPickups
+     * @param \Nord\Shipfunk\Model\Api\Shipfunk\SelectedDelivery $selectedDelivery
      * @codeCoverageIgnore
      */
     public function __construct(
         \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory,
         \Nord\Shipfunk\Model\Api\ShipfunkResponseFactory $shipfunkResponseFactory,
-        GetPickups $getPickups
+        SelectedDelivery $selectedDelivery
     ) {
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->shipfunkResponseFactory = $shipfunkResponseFactory;
-        $this->getPickupsClient = $getPickups;
+        $this->selectedDeliveryClient = $selectedDelivery;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getPickupPointsFromShipfunk(
+    public function submitSelectedDeliveryToShipfunk(
         $cartId,
         string $query
     ) {
         /** @var $quoteIdMask \Magento\Quote\Model\QuoteIdMask */
         $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
         
-        $response = $this->getPickupsClient
+        $response = $this->selectedDeliveryClient
                          ->setOrderId($quoteIdMask->getQuoteId())
                          ->execute(["query" => json_decode($query, true)]);
         /** @var \Nord\Shipfunk\Api\Data\ShipfunkResponseInterface $shipfunkResponse */

@@ -9,11 +9,11 @@ use Magento\Framework\HTTP\ZendClientFactory;
 use Magento\Framework\Locale\Resolver;
 
 /**
- * Class GetDeliveryOptions
+ * Class GetPickups
  *
  * @package Nord\Shipfunk\Model\Api\Shipfunk
  */
-class GetDeliveryOptions extends AbstractEndpoint
+class GetPickups extends AbstractEndpoint
 {
     /**
      * @var \Magento\Checkout\Model\Session
@@ -54,34 +54,30 @@ class GetDeliveryOptions extends AbstractEndpoint
     public function execute($query = [])
     {
         if (!$query) {
-          $request = $this->getRequest();
           $query = [
              'query' => [
                 'order' => [
                     'language' => $this->_getLanguageCode(),
-                    'monetary' => [
-                        'currency' => $request->getPackageCurrency()->getCurrencyCode(),
-                        'value' => $request->getBaseSubtotalInclTax() // @todo BUG WITH DIFFERENT BASE CURRENCY
-                    ],
-                    'get_pickups' => [ // get stores and carriers but without carrier pickup points
-                        'store' => 1,
-                        'store_only' => 0,
-                        'transport_company' => 0
-                    ],
-                    'products' => $this->getProducts()
+                    'carriercode' => $this->checkoutSession->getQuote()->getSelectedCarrierCode(), // @todo MAYBE THIS SHOULD BE ALLOWED
+                    'return_count' => 15 // @todo MAYBE HAVE THIS AS SYS CONFIG
                 ],
-                'customer' => [ // we'll be sending the rest later
-                    'postal_code'     => $request->getDestPostcode(),
-                    'country'         => $request->getDestCountryId()
+                'customer' => [
+                    'postal_code'     => $this->checkoutSession->getQuote()->getShippingAddress()->getPostcode(),
+                    'country'         => $this->checkoutSession->getQuote()->getShippingAddress()->getCountryId()
                 ]
              ]
           ];
+        } else {
+          $query['query']['order']['language'] = $this->_getLanguageCode();
         }
+      
         $query = utf8_encode(json_encode($query));
         $quoteId = $this->checkoutSession->getQuote()->getId();
-        $result = $this->setEndpoint('get_delivery_options')
-                      ->setOrderId($quoteId)
-                      ->post($query);
+        $this->setEndpoint('get_pickups');
+        if (!$this->getOrderId() && $quoteId) {
+          $this->setOrderId($quoteId);
+        }
+        $result = $this->post($query);
       
         return $result;
     }

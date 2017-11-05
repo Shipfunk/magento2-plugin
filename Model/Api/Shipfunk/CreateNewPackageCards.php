@@ -11,7 +11,7 @@ use Magento\Framework\DataObject;
  */
 class CreateNewPackageCards extends AbstractEndpoint
 {
-    public function execute()
+    public function execute($query = [])
     {
       
     }

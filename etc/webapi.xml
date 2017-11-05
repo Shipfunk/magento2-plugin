@@ -7,12 +7,10 @@
             <resource ref="anonymous" />
         </resources>
     </route>
-  <!--
     <route url="/V1/shipfunk/:cartId/selected-delivery" method="POST">
         <service class="Nord\Shipfunk\Api\SelectedDeliveryManagementInterface" method="submitSelectedDeliveryToShipfunk"/>
         <resources>
             <resource ref="anonymous" />
         </resources>
     </route>
-  -->
 </routes>

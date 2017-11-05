@@ -56,8 +56,8 @@ class DeliveryOptionPopup extends Template
     public function getConfig()
     {
         return [
-            'apiKey'     => $this->helper->getConfigData('test_mode') ? $this->helper->getConfigData('test_api_key') : $this->helper->getConfigData('live_api_key'),
-            'apiUrl'     => $this->helper->getConfigData('api_url'),
+            //'apiKey'     => $this->helper->getConfigData('test_mode') ? $this->helper->getConfigData('test_api_key') : $this->helper->getConfigData('live_api_key'),
+            //'apiUrl'     => $this->helper->getConfigData('api_url'),
             'baseUrl'    => $this->getBaseUrl(),
         ];
     }

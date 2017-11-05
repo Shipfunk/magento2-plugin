@@ -9,7 +9,7 @@ namespace Nord\Shipfunk\Model\Api\Shipfunk;
  */
 class DeleteParcels extends AbstractEndpoint
 {
-    public function execute()
+    public function execute($query = [])
     {
       
     }

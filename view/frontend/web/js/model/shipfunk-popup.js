@@ -13,9 +13,10 @@ define(
         'Magento_Checkout/js/model/quote',
         'Magento_Customer/js/model/address-list',
         'Magento_Ui/js/modal/alert',
-        'mage/translate'
+        'mage/translate',
+        'mage/storage'
     ],
-    function ($, ko, modal, checkoutData, quote, addressList, alert, $t) {
+    function ($, ko, modal, checkoutData, quote, addressList, alert, $t, storage) {
         'use strict';
         var carrierData = ko.observable();
         var carriercode = ko.observable();
@@ -76,37 +77,25 @@ define(
                 product_description(method.extension_attributes.method_description);
                 product_description.valueHasMutated();
 
-                var sf_returntype = "json";
-                var sf_thisorderid = window.checkoutConfig.quoteItemData[0].quote_id;
-                var sf_webshopid = window.shipfunkPopup.webshopid;
-                var sf_language_code = "EN"; // @todo THIS SHOULD BE CURRENT INTERFACE LANGUAGE
-                var sf_country = address.countryId ? address.countryId : address.country_id;
                 var sf_data = {
-                  "query": {
-                    "webshop": {
-                      "api_key": window.shipfunkPopup.apiKey // @todo DO WE NEED TO ENCRYPT THIS ??
-                    },
                     "order": {
                       "carriercode": methodCodeArray[1],
-                      "language": sf_language_code,
-                      "return_count": 5
+                      "return_count": 15
                     },
                     "customer": {
                       "postal_code": address.postcode,
-                      "country": sf_country
+                      "country": address.countryId ? address.countryId : address.country_id
                     }
-                  }
                 };
-                $.ajax({
-                    type: "GET",
-                    url: window.shipfunkPopup.apiUrl + "get_pickups/true/json/json/" + sf_thisorderid,
-                    timeout: 5000, // 5 second timeout in millis!
-                    data: { 'sf_get_pickups': JSON.stringify(sf_data) },
-                    dataType: "jsonp",
-                    success: function (data, textStatus, jqXHR) {
-                        var resp = $.parseJSON(data);
-                        var response = resp.response;
-
+                
+                storage.post(
+                    window.shipfunkPopup.baseUrl + "rest/all/V1/shipfunk/" + window.checkoutConfig.quoteData.entity_id + "/get-pickup-points",
+                    JSON.stringify({query: JSON.stringify(sf_data)})
+                ).done(
+                    function (response) {
+                        var response = JSON.parse(response.response);
+                        response = response.response;
+                      
                         if (response !== undefined && response.length) {
                             self.showModal();
                             shippingPoints(response);
@@ -116,18 +105,17 @@ define(
                             selectedPickup(false);
                         }
                         shippingPoints.valueHasMutated();
-
                     }
-                });
+                ).fail(
+                    function (response) {
+                        
+                    }
+                );
             },
           
             selectDelivery: function (point = false) {
                 var self = this;
                 var selectedData = {
-                  "query": {
-                    "webshop": {
-                      "api_key": window.shipfunkPopup.apiKey
-                    },
                     "order": {
                       "selected_option": {
                         "carriercode": carriercode(),
@@ -137,27 +125,27 @@ define(
                         "return_prices": "1"
                       }
                     }
-                  }
                 };
 
-                $.ajax({
-                    type: "GET",
-                    url: window.shipfunkPopup.apiUrl + "selected_delivery/true/json/json/" + window.checkoutConfig.quoteItemData[0].quote_id,
-                    timeout: 5000, // 5 second timeout in millis!
-                    data: {'sf_selected_delivery': JSON.stringify(selectedData)},
-                    dataType: "jsonp",
-                    success: function (data, textStatus, jqXHR) {
+                storage.post(
+                    window.shipfunkPopup.baseUrl + "rest/all/V1/shipfunk/" + window.checkoutConfig.quoteData.entity_id + "/selected-delivery",
+                    JSON.stringify({query: JSON.stringify(selectedData)})
+                ).done(
+                    function (response) {
+                        var response = JSON.parse(response.response);
+                        response = response.response;
                         if (point) {
                             selectedPickup(point);
                             self.hideModal();
                         }
-                    },
-                    error: function (jqXHR, textStatus) {
+                    }
+                ).fail(
+                    function (response) {
                         alert({
                             content: $t("Something went wrong test")
                         });
                     }
-                });
+                );
             },
            
             getShippingPoints: function () {

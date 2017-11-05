@@ -9,10 +9,8 @@ use Magento\Directory\Helper\Data;
 use Magento\Directory\Model\CountryFactory;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Directory\Model\RegionFactory;
-use Magento\Eav\Model\ResourceModel\Entity\Attribute;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
-use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\State;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
@@ -31,7 +29,6 @@ use Magento\Shipping\Model\Simplexml\ElementFactory;
 use Magento\Shipping\Model\Tracking\Result\ErrorFactory as TrackErrorFactory;
 use Magento\Shipping\Model\Tracking\Result\StatusFactory;
 use Magento\Shipping\Model\Tracking\ResultFactory as TrackFactory;
-use Nord\Shipfunk\Helper\UnitConverter;
 use Nord\Shipfunk\Model\Api\Shipfunk\CreateNewPackageCards;
 use Nord\Shipfunk\Model\Api\Shipfunk\DeleteParcels;
 use Nord\Shipfunk\Model\Api\Shipfunk\GetDeliveryOptions;
@@ -60,34 +57,9 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     protected $_productRepo;
 
     /**
-     * @var Context
-     */
-    protected $_context;
-
-    /**
-     * @var ScopeConfigInterface
-     */
-    protected $_scopeConfig;
-
-    /**
-     * @var Attribute
-     */
-    protected $_eavAttribute;
-
-    /**
-     * @var UnitConverter
-     */
-    protected $unitConverter;
-
-    /**
      * @var ShipfunkPacker
      */
     protected $packer;
-
-    /**
-     * @var Http
-     */
-    protected $httpRequest;
 
     /**
      * @var RateRequest
@@ -138,14 +110,11 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      * @param Context                 $context
      * @param Security                $xmlSecurity
      * @param ElementFactory          $xmlElFactory
-     * @param Attribute               $eavAttribute
      * @param ProductRepository       $productRepo
      * @param ShipfunkPacker          $packer
-     * @param UnitConverter           $unitConverter
      * @param GetDeliveryOptions      $GetDeliveryOptions
      * @param CreateNewPackageCards   $CreateNewPackageCards
      * @param ParcelHelper            $parcelHelper
-     * @param Http                    $httpRequest
      * @param State                   $state
      * @param TrackFactory            $trackFactory
      * @param TrackErrorFactory       $trackErrorFactory
@@ -167,14 +136,11 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         Context $context,
         Security $xmlSecurity,
         ElementFactory $xmlElFactory,
-        Attribute $eavAttribute,
         ProductRepository $productRepo,
         ShipfunkPacker $packer,
-        UnitConverter $unitConverter,
         GetDeliveryOptions $GetDeliveryOptions,
         CreateNewPackageCards $CreateNewPackageCards,
         ParcelHelper $parcelHelper,
-        Http $httpRequest,
         State $state,
         TrackFactory $trackFactory,
         TrackErrorFactory $trackErrorFactory,
@@ -209,12 +175,8 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         );
         
         $this->_productRepo = $productRepo;
-        $this->_context = $context;
         $this->_state = $state;
-        $this->_eavAttribute = $eavAttribute;
         $this->packer = $packer;
-        $this->unitConverter = $unitConverter;
-        $this->httpRequest = $httpRequest;
         $this->parcelHelper = $parcelHelper;
         $this->shippingMethodExtension = $shippingMethodExtension;
 
@@ -292,7 +254,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      */
     public function collectRates(RateRequest $request)
     {
-        $this->_logger->debug(var_export('TEST2', true));
         if (!$this->isActive()) {
             return false;
         }
