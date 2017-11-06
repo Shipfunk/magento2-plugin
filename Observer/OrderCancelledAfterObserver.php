@@ -7,11 +7,11 @@ use Magento\Framework\Event\Observer;
 use Nord\Shipfunk\Model\Api\Shipfunk\SetOrderStatus;
 
 /**
- * Class CheckoutSubmitAllAfterObserver
+ * Class OrderCancelledAfterObserver
  *
  * @package Nord\Shipfunk\Observer
  */
-class CheckoutSubmitAllAfterObserver implements ObserverInterface
+class OrderCancelledAfterObserver implements ObserverInterface
 {
     /**
      * @var SetOrderStatus
@@ -19,8 +19,6 @@ class CheckoutSubmitAllAfterObserver implements ObserverInterface
     protected $SetOrderStatus;
 
     /**
-     * CheckoutSubmitAllAfterObserver constructor.
-     *
      * @param SetOrderStatus       $SetOrderStatus
      */
     public function __construct(
@@ -39,9 +37,8 @@ class CheckoutSubmitAllAfterObserver implements ObserverInterface
         $order = $observer->getEvent()->getOrder();
 
         $this->SetOrderStatus
-            ->setOrderId($order->getQuoteId())
-            ->setFinalOrderId($order->getRealOrderId())
-            ->setOrderStatus(SetOrderStatus::STATUS_PLACE)
+            ->setOrderId($order->getRealOrderId())
+            ->setOrderStatus(SetOrderStatus::STATUS_CANCEL)
             ->execute();
     }
 }

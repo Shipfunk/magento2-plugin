@@ -3,4 +3,7 @@
     <event name="checkout_submit_all_after">
         <observer name="shipfunk_orderpaid" instance="Nord\Shipfunk\Observer\CheckoutSubmitAllAfterObserver" />
     </event>
+    <!-- event name="order_cancel_after">
+        <observer name="shipfunk_order_cancelled" instance="Nord\Shipfunk\Observer\OrderCancelledAfterObserver" />
+    </event -->
 </config>
