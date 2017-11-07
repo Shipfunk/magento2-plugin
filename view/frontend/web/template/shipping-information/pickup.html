@@ -1,0 +1,5 @@
+<div data-bind="if: selectedPickup">
+  <div data-bind="text: selectedPickup().pickup_name"></div>
+  <div data-bind="text: selectedPickup().pickup_addr"></div>
+  <div data-bind="text: selectedPickup().pickup_postal + ' ' + selectedPickup().pickup_city"></div>
+</div>

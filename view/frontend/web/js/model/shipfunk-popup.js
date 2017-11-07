@@ -14,9 +14,10 @@ define(
         'Magento_Customer/js/model/address-list',
         'Magento_Ui/js/modal/alert',
         'mage/translate',
-        'mage/storage'
+        'mage/storage',
+        'Magento_Checkout/js/model/full-screen-loader'
     ],
-    function ($, ko, modal, checkoutData, quote, addressList, alert, $t, storage) {
+    function ($, ko, modal, checkoutData, quote, addressList, alert, $t, storage, fullScreenLoader) {
         'use strict';
         var carrierData = ko.observable();
         var carriercode = ko.observable();
@@ -87,7 +88,7 @@ define(
                       "country": address.countryId ? address.countryId : address.country_id
                     }
                 };
-                
+                fullScreenLoader.startLoader();
                 storage.post(
                     window.shipfunkPopup.baseUrl + "rest/all/V1/shipfunk/" + window.checkoutConfig.quoteData.entity_id + "/get-pickup-points",
                     JSON.stringify({query: JSON.stringify(sf_data)})
@@ -105,10 +106,11 @@ define(
                             selectedPickup(false);
                         }
                         shippingPoints.valueHasMutated();
+                        fullScreenLoader.stopLoader();
                     }
                 ).fail(
                     function (response) {
-                        
+                        fullScreenLoader.stopLoader();
                     }
                 );
             },
@@ -126,7 +128,7 @@ define(
                       }
                     }
                 };
-
+                fullScreenLoader.startLoader();
                 storage.post(
                     window.shipfunkPopup.baseUrl + "rest/all/V1/shipfunk/" + window.checkoutConfig.quoteData.entity_id + "/selected-delivery",
                     JSON.stringify({query: JSON.stringify(selectedData)})
@@ -138,12 +140,14 @@ define(
                             selectedPickup(point);
                             self.hideModal();
                         }
+                        fullScreenLoader.stopLoader();
                     }
                 ).fail(
                     function (response) {
                         alert({
                             content: $t("Something went wrong test")
                         });
+                        fullScreenLoader.stopLoader();
                     }
                 );
             },

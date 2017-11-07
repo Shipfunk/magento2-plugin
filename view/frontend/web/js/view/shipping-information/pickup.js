@@ -9,7 +9,7 @@ define([
         getCarrierData: shipfunkPopup.getCarrierData(),
       
         defaults: {
-            template: 'Nord_Shipfunk/shipfunk-pickup'
+            template: 'Nord_Shipfunk/shipping-information/pickup'
         }
     });
 });

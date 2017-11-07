@@ -20,15 +20,18 @@ define([
     'use strict';
 
     var shippingPoints = shipfunkPopupModel.getShippingPoints();
+    var selectedPickup = shipfunkPopupModel.getSelectedPickup();
     var selectedPointId = shipfunkPopupModel.getSelectedPickupId();
 
     var mixin = {
         selectShippingMethod: function (shippingMethod) {
             var result = this._super();
 
-            // shipfunkPopupModel.removeShipping();
             if (shippingMethod && 'shipfunk' == shippingMethod.carrier_code) {
                 shipfunkPopupModel.setCarrierData(shippingMethod);
+            } else {
+                shippingPoints(null);
+                selectedPickup(false);
             }
 
             return result;

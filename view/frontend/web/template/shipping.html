@@ -34,7 +34,7 @@
     </div>
 </li>
 
-<each args="getRegion('pickup-info')" render="" />
+<each if="visible()" args="getRegion('pickup-info')" render="" />
 
 <!--Shipping method template-->
 <li id="opc-shipping_method"
