@@ -6,4 +6,20 @@
         <attribute code="delivtime" type="string"/>
         <attribute code="category" type="string"/>
     </extension_attributes>
+    <extension_attributes for="Magento\Checkout\Api\Data\ShippingInformationInterface">
+        <attribute code="pickup_name" type="string"/>
+        <attribute code="pickup_addr" type="string"/>
+        <attribute code="pickup_postal" type="string"/>
+        <attribute code="pickup_city" type="string"/>
+        <attribute code="pickup_country" type="string"/>
+        <attribute code="pickup_id" type="string"/>
+        <attribute code="pickup_openinghours" type="string"/>
+        <attribute code="pickup_openinghours_excep" type="string"/>
+    </extension_attributes>
+    <extension_attributes for="Magento\Quote\Api\Data\CartInterface">
+        <attribute code="selected_pickup" type="Nord\Shipfunk\Api\Data\QuoteSelectedPickupInterface"/>
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
+        <attribute code="selected_pickup" type="Nord\Shipfunk\Api\Data\OrderSelectedPickupInterface"/>
+    </extension_attributes>
 </config>

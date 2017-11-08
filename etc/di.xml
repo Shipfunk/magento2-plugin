@@ -25,5 +25,5 @@
     
     <preference for="Nord\Shipfunk\Api\GetPickupPointsManagementInterface" type="Nord\Shipfunk\Model\Api\GetPickupPointsManagement" />
     <preference for="Nord\Shipfunk\Api\SelectedDeliveryManagementInterface" type="Nord\Shipfunk\Model\Api\SelectedDeliveryManagement" />
-    <preference for="Nord\Shipfunk\Api\Data\ShipfunkResponseInterface" type="Nord\Shipfunk\Model\Api\ShipfunkResponse" />
+    <preference for="Nord\Shipfunk\Api\Data\ShipfunkResponseInterface" type="Nord\Shipfunk\Model\Api\ShipfunkResponse" />  
 </config>
