@@ -25,5 +25,11 @@
     
     <preference for="Nord\Shipfunk\Api\GetPickupPointsManagementInterface" type="Nord\Shipfunk\Model\Api\GetPickupPointsManagement" />
     <preference for="Nord\Shipfunk\Api\SelectedDeliveryManagementInterface" type="Nord\Shipfunk\Model\Api\SelectedDeliveryManagement" />
-    <preference for="Nord\Shipfunk\Api\Data\ShipfunkResponseInterface" type="Nord\Shipfunk\Model\Api\ShipfunkResponse" />  
+    <preference for="Nord\Shipfunk\Api\Data\ShipfunkResponseInterface" type="Nord\Shipfunk\Model\Api\ShipfunkResponse" /> 
+  
+    <preference for="Nord\Shipfunk\Api\Data\QuoteSelectedPickupInterface" type="Nord\Shipfunk\Model\Quote\SelectedPickup" />
+    <preference for="Nord\Shipfunk\Api\Data\OrderSelectedPickupInterface" type="Nord\Shipfunk\Model\Order\SelectedPickup" />
+    <type name="Magento\Checkout\Api\ShippingInformationManagementInterface">
+        <plugin name="save_selected_pickup_to_quote" type="Nord\Shipfunk\Plugin\ShippingInformationManagementPlugin"/>
+    </type>
 </config>
