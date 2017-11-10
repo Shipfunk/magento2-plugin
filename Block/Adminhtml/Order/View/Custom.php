@@ -3,7 +3,6 @@
 namespace Nord\Shipfunk\Block\Adminhtml\Order\View;
 
 use Magento\Backend\Block\Template;
-use Nord\Shipfunk\Controller\Index\Index as PickupInformation;
 
 /**
  * Class Custom
@@ -11,11 +10,6 @@ use Nord\Shipfunk\Controller\Index\Index as PickupInformation;
  */
 class Custom extends Template
 {
-    /**
-     * @var PickupInformation
-     */
-    protected $pickupInformation;
-
     /**
      * @var []
      */
@@ -28,10 +22,8 @@ class Custom extends Template
      * @param PickupInformation $pickupInformation
      * @param array             $data
      */
-    public function __construct(Template\Context $context, PickupInformation $pickupInformation, array $data = [])
+    public function __construct(Template\Context $context, array $data = [])
     {
-        $this->pickupInformation = $pickupInformation;
-
         parent::__construct($context, $data);
     }
 
@@ -40,17 +32,7 @@ class Custom extends Template
      */
     public function hasPickupInformation()
     {
-        $quote_id = $this->getOrder()->getQuoteId();
-
-        $pickup = $this->pickupInformation->getPickupFromQuote(['select', false, $quote_id]);
-
-        if ($pickup) {
-            $this->pickup = $pickup;
-
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     }
 
     /**

@@ -32,4 +32,7 @@
     <type name="Magento\Checkout\Api\ShippingInformationManagementInterface">
         <plugin name="save_selected_pickup_to_quote" type="Nord\Shipfunk\Plugin\ShippingInformationManagementPlugin"/>
     </type>
+    <type name="Magento\Quote\Api\CartRepositoryInterface">
+        <plugin name="get_selected_pickup_to_quote" type="Nord\Shipfunk\Plugin\LoadQuoteAfter"/>
+    </type>
 </config>

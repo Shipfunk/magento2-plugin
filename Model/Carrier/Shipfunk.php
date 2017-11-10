@@ -62,11 +62,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     protected $packer;
 
     /**
-     * @var RateRequest
-     */
-    protected $rateRequest;
-
-    /**
      * @var GetDeliveryOptions
      */
     protected $GetDeliveryOptions;
@@ -317,6 +312,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     }
 
     /**
+     * Disable on admin side
      * @return bool
      */
     public function isActive()
@@ -326,26 +322,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         }
 
         return parent::isActive();
-    }
-
-    /**
-     * @return RateRequest
-     */
-    public function getRateRequest()
-    {
-        return $this->rateRequest;
-    }
-
-    /**
-     * @param RateRequest $rateRequest
-     *
-     * @return $this
-     */
-    public function setRateRequest($rateRequest)
-    {
-        $this->rateRequest = $rateRequest;
-
-        return $this;
     }
 
     /**
