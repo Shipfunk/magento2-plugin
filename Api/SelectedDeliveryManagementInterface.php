@@ -9,7 +9,7 @@ namespace Nord\Shipfunk\Api;
 interface SelectedDeliveryManagementInterface
 {
     /**
-     * @param string $cartId
+     * @param int $cartId
      * @param string $query
      * @return \Nord\Shipfunk\Api\Data\ShipfunkResponseInterface
      */

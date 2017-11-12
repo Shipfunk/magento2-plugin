@@ -11,17 +11,17 @@ define(
         'Magento_Ui/js/modal/modal',
         'Magento_Checkout/js/checkout-data',
         'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/model/resource-url-manager',
         'Magento_Customer/js/model/address-list',
         'Magento_Ui/js/modal/alert',
         'mage/translate',
         'mage/storage',
         'Magento_Checkout/js/model/full-screen-loader'
     ],
-    function ($, ko, modal, checkoutData, quote, addressList, alert, $t, storage, fullScreenLoader) {
+    function ($, ko, modal, checkoutData, quote, resourceUrlManager, addressList, alert, $t, storage, fullScreenLoader) {
         'use strict';
         var carrierData = ko.observable();
         var carriercode = ko.observable();
-        var productcode = ko.observable();
         var product_description = ko.observable();
         var price = ko.observable();
         var selectedPickup = ko.observable(false);
@@ -70,8 +70,6 @@ define(
 
                 carriercode(methodCodeArray[1]);
                 carriercode.valueHasMutated();
-                productcode(methodCodeArray[2]);
-                productcode.valueHasMutated();
                 price(method.amount);
                 price.valueHasMutated();
 
@@ -90,12 +88,12 @@ define(
                 };
                 fullScreenLoader.startLoader();
                 storage.post(
-                    window.shipfunkPopup.baseUrl + "rest/all/V1/shipfunk/" + window.checkoutConfig.quoteData.entity_id + "/get-pickup-points",
+                    resourceUrlManager.getUrlForGetPickupPoints(quote),
                     JSON.stringify({query: JSON.stringify(sf_data)})
                 ).done(
                     function (response) {
-                        var response = JSON.parse(response.response);
-                        response = response.response;
+                        var responseJson = JSON.parse(response.response);
+                        response = responseJson.response;
                       
                         if (response !== undefined && response.length) {
                             self.showModal();
@@ -130,12 +128,12 @@ define(
                 };
                 fullScreenLoader.startLoader();
                 storage.post(
-                    window.shipfunkPopup.baseUrl + "rest/all/V1/shipfunk/" + window.checkoutConfig.quoteData.entity_id + "/selected-delivery",
+                    resourceUrlManager.getUrlForSelectedDelivery(quote),
                     JSON.stringify({query: JSON.stringify(selectedData)})
                 ).done(
                     function (response) {
-                        var response = JSON.parse(response.response);
-                        response = response.response;
+                        var responseJson = JSON.parse(response.response);
+                        response = responseJson.response;
                         if (point) {
                             selectedPickup(point);
                             self.hideModal();
@@ -162,10 +160,6 @@ define(
 
             getCarrierCode: function () {
                 return carriercode;
-            },
-
-            getProductCode: function () {
-                return productcode;
             },
 
             getSelectedPickup: function () {

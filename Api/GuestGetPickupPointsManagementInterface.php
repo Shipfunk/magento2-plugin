@@ -3,13 +3,13 @@
 namespace Nord\Shipfunk\Api;
 
 /**
- * Interface GetPickupPointsManagementInterface
+ * Interface GuestGetPickupPointsManagementInterface
  * @api
  */
-interface GetPickupPointsManagementInterface
+interface GuestGetPickupPointsManagementInterface
 {
     /**
-     * @param int $cartId
+     * @param string $cartId
      * @param string $query
      * @return \Nord\Shipfunk\Api\Data\ShipfunkResponseInterface
      */

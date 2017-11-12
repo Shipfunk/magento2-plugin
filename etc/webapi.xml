@@ -1,16 +1,34 @@
 <?xml version="1.0"?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">  
-    <route url="/V1/shipfunk/:cartId/get-pickup-points" method="POST">
-        <service class="Nord\Shipfunk\Api\GetPickupPointsManagementInterface" method="getPickupPointsFromShipfunk"/>
+    <route url="/V1/guest-carts/:cartId/get-pickup-points" method="POST">
+        <service class="Nord\Shipfunk\Api\GuestGetPickupPointsManagementInterface" method="getPickupPointsFromShipfunk"/>
         <resources>
             <resource ref="anonymous" />
         </resources>
     </route>
-    <route url="/V1/shipfunk/:cartId/selected-delivery" method="POST">
-        <service class="Nord\Shipfunk\Api\SelectedDeliveryManagementInterface" method="submitSelectedDeliveryToShipfunk"/>
+    <route url="/V1/carts/mine/get-pickup-points" method="POST">
+        <service class="Nord\Shipfunk\Api\GetPickupPointsManagementInterface" method="getPickupPointsFromShipfunk"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/guest-carts/:cartId/selected-delivery" method="POST">
+        <service class="Nord\Shipfunk\Api\GuestSelectedDeliveryManagementInterface" method="submitSelectedDeliveryToShipfunk"/>
         <resources>
             <resource ref="anonymous" />
         </resources>
+    </route>
+    <route url="/V1/carts/mine/selected-delivery" method="POST">
+        <service class="Nord\Shipfunk\Api\SelectedDeliveryManagementInterface" method="submitSelectedDeliveryToShipfunk"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
     </route>
 </routes>

@@ -10,11 +10,14 @@ var config = {
             'Magento_Checkout/js/view/shipping': {
                 'Nord_Shipfunk/js/view/shipping-mixin': true
             },
-            'Magento_Checkout/js/model/address-converter': {
-                'Nord_Shipfunk/js/model/address-converter-mixin': true
-            },
+            //'Magento_Checkout/js/model/address-converter': {
+            //    'Nord_Shipfunk/js/model/address-converter-mixin': true
+            //},
             'Magento_Checkout/js/model/checkout-data-resolver': {
                 'Nord_Shipfunk/js/model/checkout-data-resolver-mixin': true
+            },
+            'Magento_Checkout/js/model/resource-url-manager': {
+                'Nord_Shipfunk/js/model/resource-url-manager-mixin': true
             }
         }
     },

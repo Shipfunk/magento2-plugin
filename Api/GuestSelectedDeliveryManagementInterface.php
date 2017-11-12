@@ -3,17 +3,17 @@
 namespace Nord\Shipfunk\Api;
 
 /**
- * Interface GetPickupPointsManagementInterface
+ * Interface GuestSelectedDeliveryManagementInterface
  * @api
  */
-interface GetPickupPointsManagementInterface
+interface GuestSelectedDeliveryManagementInterface
 {
     /**
-     * @param int $cartId
+     * @param string $cartId
      * @param string $query
      * @return \Nord\Shipfunk\Api\Data\ShipfunkResponseInterface
      */
-    public function getPickupPointsFromShipfunk(
+    public function submitSelectedDeliveryToShipfunk(
         $cartId,
         string $query
     );

@@ -19,7 +19,9 @@
     <preference for="Magento\Quote\Model\ShippingMethodManagement" type="Nord\Shipfunk\Model\ShippingMethodManagement"/>
     <preference for="Magento\Shipping\Model\Rate\Result" type="Nord\Shipfunk\Model\Rate\Result" />
     
+    <preference for="Nord\Shipfunk\Api\GuestGetPickupPointsManagementInterface" type="Nord\Shipfunk\Model\Api\GuestGetPickupPointsManagement" />
     <preference for="Nord\Shipfunk\Api\GetPickupPointsManagementInterface" type="Nord\Shipfunk\Model\Api\GetPickupPointsManagement" />
+    <preference for="Nord\Shipfunk\Api\GuestSelectedDeliveryManagementInterface" type="Nord\Shipfunk\Model\Api\GuestSelectedDeliveryManagement" />
     <preference for="Nord\Shipfunk\Api\SelectedDeliveryManagementInterface" type="Nord\Shipfunk\Model\Api\SelectedDeliveryManagement" />
     <preference for="Nord\Shipfunk\Api\Data\ShipfunkResponseInterface" type="Nord\Shipfunk\Model\Api\ShipfunkResponse" /> 
   
