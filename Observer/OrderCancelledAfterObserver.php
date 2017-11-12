@@ -10,6 +10,7 @@ use Nord\Shipfunk\Model\Api\Shipfunk\SetOrderStatus;
  * Class OrderCancelledAfterObserver
  *
  * @package Nord\Shipfunk\Observer
+ * @todo Unused. Check if this is ever going to be used and remove if not 
  */
 class OrderCancelledAfterObserver implements ObserverInterface
 {

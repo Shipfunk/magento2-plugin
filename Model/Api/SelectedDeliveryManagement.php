@@ -4,6 +4,9 @@ namespace Nord\Shipfunk\Model\Api;
 
 use Nord\Shipfunk\Model\Api\Shipfunk\SelectedDelivery;
 
+/**
+ * @todo Should this be merged with ShippingInformationManagementPlugin and dedicated API removed ?
+ */
 class SelectedDeliveryManagement implements \Nord\Shipfunk\Api\SelectedDeliveryManagementInterface
 {
     /**

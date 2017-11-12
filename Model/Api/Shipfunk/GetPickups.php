@@ -72,11 +72,7 @@ class GetPickups extends AbstractEndpoint
         }
       
         $query = utf8_encode(json_encode($query));
-        $quoteId = $this->checkoutSession->getQuote()->getId();
         $this->setEndpoint('get_pickups');
-        if (!$this->getOrderId() && $quoteId) {
-          $this->setOrderId($quoteId);
-        }
         $result = $this->post($query);
       
         return $result;
