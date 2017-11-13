@@ -30,9 +30,7 @@ class ShippingInformationManagementPlugin
      * @var \Nord\Shipfunk\Model\Quote\SelectedPickupFactory
      */
     protected $quoteSelectedPickupFactory;
-  
-     private $logger;
-  
+   
     /**
      * Constructor
      *
@@ -42,13 +40,11 @@ class ShippingInformationManagementPlugin
      * @param CartExtensionFactory|null $cartExtensionFactory
      */
     public function __construct(
-        \Psr\Log\LoggerInterface $logger,
         ShippingInformationExtensionFactory $shippingInformationExtensionFactory = null,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Nord\Shipfunk\Model\Quote\SelectedPickupFactory $quoteSelectedPickupFactory = null,
         CartExtensionFactory $cartExtensionFactory = null
     ) {
-        $this->logger = $logger;
         $this->quoteRepository = $quoteRepository;
         $this->cartExtensionFactory = $cartExtensionFactory ?: ObjectManager::getInstance()
             ->get(CartExtensionFactory::class);
@@ -72,7 +68,6 @@ class ShippingInformationManagementPlugin
         // new state
         $shippingInformationExtension = $addressInformation->getExtensionAttributes();
         $isPickupSubmitted = $shippingInformationExtension && $shippingInformationExtension->getPickupName();
-       // $this->logger->debug(var_export($isPickupSubmitted, true));
         // no changes
         if (!$isPickupPresent && !$isPickupSubmitted) {
             return $result;
@@ -82,8 +77,6 @@ class ShippingInformationManagementPlugin
         // delete needed
         if (!$isPickupSubmitted) {
             $quoteSelectedPickup->load($selectedPickup->getSelectedPickupId())->delete();
-            //$cartExtension->setSelectedPickup(null);
-            //$quote->setExtensionAttributes($cartExtension);
             return $result;
         }
         // update (or creation) needed
@@ -103,8 +96,6 @@ class ShippingInformationManagementPlugin
                               ->save();
           
         }
-      
-       // $this->logger->debug($pickupHash);
       
         return $result;
     }

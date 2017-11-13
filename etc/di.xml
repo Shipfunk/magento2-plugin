@@ -10,14 +10,9 @@
     <type name="Magento\Quote\Model\Cart\ShippingMethodConverter">
         <plugin name="shipfunk_converter" type="Nord\Shipfunk\Plugin\ShippingMethodConverterPlugin"/>
     </type>
-    <!-- type name="Magento\Sales\Block\Adminhtml\Order\View">
-        <plugin name="BoxPackerButton" type="Nord\Shipfunk\Plugin\Block\Adminhtml\Order\View"/>
-    </type -->
     <type name="Magento\Shipping\Block\Adminhtml\Order\Packaging\Grid">
         <plugin name="shipfunk_grid" type="Nord\Shipfunk\Plugin\GridPlugin"/>
     </type>
-    <preference for="Magento\Quote\Model\ShippingMethodManagement" type="Nord\Shipfunk\Model\ShippingMethodManagement"/>
-    <preference for="Magento\Shipping\Model\Rate\Result" type="Nord\Shipfunk\Model\Rate\Result" />
     
     <preference for="Nord\Shipfunk\Api\GuestGetPickupPointsManagementInterface" type="Nord\Shipfunk\Model\Api\GuestGetPickupPointsManagement" />
     <preference for="Nord\Shipfunk\Api\GetPickupPointsManagementInterface" type="Nord\Shipfunk\Model\Api\GetPickupPointsManagement" />
