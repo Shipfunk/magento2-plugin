@@ -291,7 +291,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
                     $method = $this->_rateMethodFactory->create();
                     $method->setCarrier('shipfunk');
                     $method->setMethod(
-                        $carrier->Carriercode.'_'.$carrierOption->carriercode // .'_'.$carrierOption->productcode
+                        $carrier->Carriercode.'_'.$carrierOption->carriercode
                     );
                     // not visible anywhere but saved in database quote_shipping_rate
                     // to add it on frontend needs plugin on Magento\Quote\Model\Cart\ShippingMethodConverter::modelToDataObject  and possibly extension_attribute for Magento\Quote\Api\Data\ShippingMethodInterface
@@ -325,30 +325,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     }
 
     /**
-     * Get tracking information
-     *
-     * @param string $tracking
-     *
-     * @return string|false
-     * @api
-     */
-    public function getTrackingInfo($tracking)
-    {
-        $result = $this->getTracking($tracking);
-
-        if ($result instanceof \Magento\Shipping\Model\Tracking\Result) {
-            $trackings = $result->getAllTrackings();
-            if ($trackings) {
-                return $trackings[0];
-            }
-        } elseif (is_string($result) && !empty($result)) {
-            return $result;
-        }
-
-        return false;
-    }
-
-    /**
      * Get tracking
      *
      * @param string|string[] $trackings
@@ -358,60 +334,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     public function getTracking($trackings)
     {
         return $this->GetTrackingEvents->getResult($trackings);
-    }
-
-    /**
-     * Do request to shipment
-     *
-     * @param Request $request
-     *
-     * @return \Magento\Framework\DataObject
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function requestToShipment($request)
-    {
-        $this->deleteParcels($request->getOrderShipment()->getOrder()->getRealOrderId());
-
-        $packages = $request->getPackages();
-        if (!is_array($packages) || !$packages) {
-            throw new LocalizedException(__('No packages for request'));
-        }
-        if ($request->getStoreId() != null) {
-            $this->setStore($request->getStoreId());
-        }
-
-        $data = [];
-        $result = null;
-
-        foreach ($packages as $packageId => $package) {
-            $request->setPackageId($packageId);
-            $request->setPackagingType($package['params']['container']);
-            $request->setPackageWeight($package['params']['weight']);
-            $request->setPackageParams(new DataObject($package['params']));
-            $request->setPackageItems($package['items']);
-            $result = $this->_doShipmentRequest($request);
-
-            if ($result->hasErrors()) {
-                $this->rollBack($data);
-                break;
-            } else {
-                $data[] = [
-                    'tracking_number' => $result->getTrackingNumber(),
-                    'label_content'   => $result->getShippingLabelContent(),
-                ];
-            }
-            if (!isset($isFirstRequest)) {
-                $request->setMasterTrackingId($result->getTrackingNumber());
-                $isFirstRequest = false;
-            }
-        }
-
-        $response = new DataObject(['info' => $data]);
-        if ($result->getErrors()) {
-            $response->setErrors($result->getErrors());
-        }
-
-        return $response;
     }
 
     /**
@@ -427,19 +349,45 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     }
 
     /**
-     * @param DataObject $request
+     * Sending the single CreateNewPackageCards API request for each Magento package
      *
      * @return DataObject
      */
     protected function _doShipmentRequest(DataObject $request)
     {
-        $this->_debug('WITH Shipping Labels -- Listen to Mage Packages');
         $this->_prepareShipmentRequest($request);
-
-        $this->CreateNewPackageCards
-            ->setRequest($request);
-        $response = $this->CreateNewPackageCards->getResult();
-
+        $this->_debug(var_export($request->debug(), true));
+        $orderId = $request->getOrderShipment()->getOrder()->getRealOrderId();
+        $packages = [
+          $request->getPackageId() => [
+            'params' => $request->getPackageParams()->toArray(),
+            'items' => $request->getPackageItems()
+          ]
+        ];
+        $shipfunkResponse = $this->CreateNewPackageCards
+                              ->setPackages($packages)
+                              ->setOrderId($orderId)
+                              ->setRequest($request)
+                              ->execute();
+        $shipfunkResponse = json_decode($shipfunkResponse->getBody());
+        $this->_debug($shipfunkResponse);
+      
+        $response = new DataObject();
+        if (isset($shipfunkResponse->Error)) {
+          $response->setError(true);
+          // $errorMessage = __("shipfunk_error_7");
+          $response->setErrors($shipfunkResponse->Error->Message); // @todo Check if error messages are returned in correct language
+          $response->setMessage($shipfunkResponse->Error->Message);
+        } else {
+           if (isset($shipfunkResponse->response) && isset($shipfunkResponse->response->parcels)) {
+              $parcelInformation = $shipfunkResponse->response->parcels[0];
+              $sendTrCode = $parcelInformation->send_trcode;
+              $sendCard = base64_decode($parcelInformation->send_card);
+              $response->setTrackingNumber($sendTrCode);
+              $response->setShippingLabelContent($sendCard);
+           }
+        }
+        $response->setGatewayResponse(json_encode($shipfunkResponse));
         return $response;
     }
 

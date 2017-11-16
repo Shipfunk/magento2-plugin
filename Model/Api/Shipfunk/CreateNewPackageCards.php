@@ -2,7 +2,7 @@
 
 namespace Nord\Shipfunk\Model\Api\Shipfunk;
 
-use Magento\Framework\DataObject;
+use Magento\Sales\Api\OrderItemRepositoryInterface;
 
 /**
  * Class CreateNewPackageCards
@@ -11,103 +11,71 @@ use Magento\Framework\DataObject;
  */
 class CreateNewPackageCards extends AbstractEndpoint
 {
-    public function execute($query = [])
-    {
-      
-    }
+    /**
+     * @var OrderItemRepositoryInterface
+     */
+    protected $orderItemRepository;
   
     /**
-     * @return string
+     *
+     * @param \Psr\Log\LoggerInterface    $logger
+     * @param \Nord\Shipfunk\Helper\Data $shipfunkDataHelper
+     * @param \Magento\Framework\HTTP\ZendClientFactory  $httpClientFactory
+     * @param OrderItemRepositoryInterface $orderItemRepository
      */
-    public function getRestFormat()
-    {
-        return "/both/xml";
+    public function __construct(
+        \Psr\Log\LoggerInterface $logger,
+        \Nord\Shipfunk\Helper\Data $shipfunkDataHelper,
+        \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
+        OrderItemRepositoryInterface $orderItemRepository
+    ) {
+        parent::__construct($logger, $shipfunkDataHelper, $httpClientFactory);
+        $this->orderItemRepository = $orderItemRepository;
     }
-
-    /**
-     * @return DataObject
-     */
-    public function getResult()
+  
+    public function execute($query = [])
     {
-        $request = $this->getRequest();
-
-        $this->setOrder($request->getOrderShipment()->getOrder());
-
-        $shippingDescription = $this->getOrder()->getData('shipping_description');
-        $shipping = explode(" - ", $shippingDescription);
-        $shippingCompany = $shipping[0];
-
-        $parcelParams = $request->getPackageParams();
-        $parcelId = $request->getPackageId();
-
-        $this->setSimpleXml();
-        $this->appendToXml($this->getWebshop(), $this->simpleXml);
-        $this->appendToXml(
-            [
+        if (!$query) {
+          $request = $this->getRequest(); 
+          // decide here, based on available data, are we sending parcels or product codes
+          $packages = $this->getPackages();
+          
+          $parcels = [];
+          foreach ($packages as $pkgId => $pkg) {
+              $skus = [];
+              foreach ($pkg['items'] as $itemId => $itemData) {
+                  $orderItem = $this->orderItemRepository->get($itemId);
+                  $skus[] = $orderItem->getSku();
+              }
+              $parcels[] = [
+                  'warehouse' => $this->helper->getConfigData('warehouse'),
+                  'product_codes' => $skus  // @todo How is split qty per package affecting Shipfunk ? 
+              ];
+          }
+          $query = [
+             'query' => [
                 'order' => [
-                    'orderid'   => $this->getOrder()->getRealOrderId(),
-                    'returnNow' => 1,
+                    'return_cards' => 1, // @todo should this be configurable ?
+                    'parcels' => $parcels
                 ],
-            ],
-            $this->simpleXml
-        );
-
-        $parcel = [
-            'warehouse'  => $this->helper->getConfigData('warehouse'),
-            'parcelCode' => $parcelId,
-            'weight'     => $parcelParams->getWeight(),
-            'dimens'     => $parcelParams->getLength()."x".$parcelParams->getWidth()."x".$parcelParams->getHeight(),
-        ];
-
-        $this->appendToXml(
-            [
-                'parcel' => $parcel,
-            ],
-            $this->simpleXml,
-            'order'
-        );
-
-        $xml = $this->simpleXml->asXML();
-
-        $result = $this
-            ->setRoute('create_new_package_cards')
-            ->setFieldname('createnewpgcard')
-            ->post($xml);
-
-        $resultXml = simplexml_load_string($result->getBody());
-        $response = new DataObject();
-
-        if (!isset($resultXml->parcel)) {
-            // if we get an error here, it usually means that selecteddelivery has not been set or in most cases, we have a duplicate temp order id
-            $response->setError(true);
-            /*
-            $this->logger->log(
-                LogLevel::INFO,
-                "Shipfunk Error (CreateNewPackageCards) : ".$resultXml->Error->Message->__toString()
-            );
-            */
-            $errorMessage = __("shipfunk_error_7");
-
-            $response->setErrors($errorMessage);
-            $response->setMessage($errorMessage);
-        } else {
-            $parcelInformation = $resultXml->parcel;
-            $sendTrCode = $parcelInformation->send_trcode->__toString();
-            $sendCard = base64_decode($parcelInformation->send_card->__toString());
-
-            $request->setPackageId($parcelId);
-            $request->setPackagingType($parcelParams->getContainer());
-            $request->setPackageWeight($parcelParams->getWeight());
-            $request->setPackageParams(new DataObject($parcelParams->getData()));
-
-            $response->setTrackingNumber($sendTrCode."/".$shippingCompany);
-            $response->setShippingLabelContent($sendCard);
+                'customer' => [
+                    'first_name' => $request->getRecipientContactPersonFirstName(),
+                    'last_name' => $request->getRecipientContactPersonLastName(),
+                    'street_address' => $request->getRecipientAddressStreet(),
+                    'postal_code' => $request->getRecipientAddressPostalCode(),
+                    'city' => $request->getRecipientAddressCity(),
+                    'country' => $request->getRecipientAddressCountryCode(),
+                    'phone' => $request->getRecipientContactPhoneNumber(),
+                    'email' => $request->getRecipientEmail()
+                ]
+             ]
+          ];
         }
-
-        $response->setGatewayResponse($resultXml);
-
-        return $response;
+      
+      
+        $query = utf8_encode(json_encode($query));
+        $result = $this->setEndpoint('create_new_package_cards')->post($query);
+      
+        return $result;
     }
-
-
 }
