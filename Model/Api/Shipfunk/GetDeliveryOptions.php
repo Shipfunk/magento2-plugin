@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
 use Magento\Framework\HTTP\ZendClientFactory;
 use Magento\Framework\Locale\Resolver;
+use Magento\Framework\Pricing\Helper\Data as PriceHelper;
 
 /**
  * Class GetDeliveryOptions
@@ -26,22 +27,30 @@ class GetDeliveryOptions extends AbstractEndpoint
     protected $_localeResolver;
   
     /**
+     * @var PriceHelper
+     */
+    protected $_priceHelper;
+  
+    /**
      *
      * @param LoggerInterface    $logger
      * @param ShipfunkDataHelper $shipfunkDataHelper
      * @param ZendClientFactory  $httpClientFactory
      * @param CheckoutSession    $checkoutSession
+     * @param PriceHelper        $priceHelper
      */
     public function __construct(
         LoggerInterface $logger,
         ShipfunkDataHelper $shipfunkDataHelper,
         ZendClientFactory $httpClientFactory,
         CheckoutSession $checkoutSession,
-        \Magento\Framework\Locale\Resolver $localeResolver
+        \Magento\Framework\Locale\Resolver $localeResolver,
+        PriceHelper        $priceHelper
     ) {
         parent::__construct($logger, $shipfunkDataHelper, $httpClientFactory);
         $this->checkoutSession = $checkoutSession;
         $this->_localeResolver = $localeResolver;
+        $this->_priceHelper = $priceHelper;
     }
   
     protected function _getLanguageCode()
@@ -61,7 +70,7 @@ class GetDeliveryOptions extends AbstractEndpoint
                     'language' => $this->_getLanguageCode(),
                     'monetary' => [
                         'currency' => $request->getPackageCurrency()->getCurrencyCode(),
-                        'value' => $request->getBaseSubtotalInclTax() // @todo BUG WITH DIFFERENT BASE CURRENCY
+                        'value' => $this->_priceHelper->currency($request->getBaseSubtotalInclTax(), false, false) // @todo BUG WITH DIFFERENT BASE CURRENCY
                     ],
                     'get_pickups' => [ // get stores and carriers but without carrier pickup points
                         'store' => 1,

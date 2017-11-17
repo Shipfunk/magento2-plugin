@@ -17,9 +17,11 @@ class DimensionsUnits implements ArrayInterface
     public function toOptionArray()
     {
         return [
-            ['value' => 'cm', 'label' => 'cm'],
-            ['value' => 'm', 'label' => 'm'],
-            ['value' => 'ft', 'label' => 'ft'],
+            ['value' => 'mm', 'label' => __('millimeters')],
+            ['value' => 'cm', 'label' => __('centimeters')],
+            ['value' => 'm', 'label' => __('meters')],
+            ['value' => 'in', 'label' => __('inches')],
+            ['value' => 'ft', 'label' => __('feets')],
         ];
     }
 
