@@ -118,11 +118,14 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     protected function get($requestData)
     {
         $data = ['sf_' . $this->getEndpoint() => $requestData];
+        $this->log->debug(var_export($data, true));
         $client = $this->_httpClientFactory->create();
         $client->setUri((string) $this->getApiUrl());
         $client->setConfig(['maxredirects' => 0, 'timeout' => 30]);
         $client->setHeaders($this->getHeaders());
         $client->setParameterGet($data);
+        $this->log->debug(var_export($this->getHeaders(), true));
+        $this->log->debug(var_export($this->getApiUrl(), true));
         $result = $client->request(\Magento\Framework\HTTP\ZendClient::GET);
       
         return $result;

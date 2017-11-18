@@ -34,8 +34,7 @@ use Nord\Shipfunk\Model\Api\Shipfunk\DeleteParcels;
 use Nord\Shipfunk\Model\Api\Shipfunk\GetDeliveryOptions;
 use Nord\Shipfunk\Model\Api\Shipfunk\GetTrackingEvents;
 use Nord\Shipfunk\Helper\ParcelHelper;
-use Nord\Shipfunk\Model\BoxPacker\Box;
-use Nord\Shipfunk\Model\BoxPacker\ShipfunkPacker;
+use Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection;
 
 /**
  * Class Shipfunk
@@ -55,11 +54,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      * @var ProductRepository
      */
     protected $_productRepo;
-
-    /**
-     * @var ShipfunkPacker
-     */
-    protected $packer;
 
     /**
      * @var GetDeliveryOptions
@@ -95,6 +89,11 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      * @var ShippingMethodExtension
      */
     protected $shippingMethodExtension;
+  
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection
+     */
+    protected $trackCollection;
 
     /**
      * Shipfunk constructor.
@@ -106,7 +105,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      * @param Security                $xmlSecurity
      * @param ElementFactory          $xmlElFactory
      * @param ProductRepository       $productRepo
-     * @param ShipfunkPacker          $packer
      * @param GetDeliveryOptions      $GetDeliveryOptions
      * @param CreateNewPackageCards   $CreateNewPackageCards
      * @param ParcelHelper            $parcelHelper
@@ -122,6 +120,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      * @param GetTrackingEvents       $GetTrackingEvents
      * @param DeleteParcels           $DeleteParcels
      * @param ShippingMethodExtension $shippingMethodExtension
+     * @param \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection $trackCollection
      * @param array                   $data
      */
     public function __construct(
@@ -132,7 +131,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         Security $xmlSecurity,
         ElementFactory $xmlElFactory,
         ProductRepository $productRepo,
-        ShipfunkPacker $packer,
         GetDeliveryOptions $GetDeliveryOptions,
         CreateNewPackageCards $CreateNewPackageCards,
         ParcelHelper $parcelHelper,
@@ -148,6 +146,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         GetTrackingEvents $GetTrackingEvents,
         DeleteParcels $DeleteParcels,
         ShippingMethodExtension $shippingMethodExtension,
+        \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection $trackCollection,
         array $data = []
     ) {
         parent::__construct(
@@ -171,40 +170,13 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
         
         $this->_productRepo = $productRepo;
         $this->_state = $state;
-        $this->packer = $packer;
         $this->parcelHelper = $parcelHelper;
         $this->shippingMethodExtension = $shippingMethodExtension;
-
+        $this->trackCollection = $trackCollection;
         $this->GetDeliveryOptions = $GetDeliveryOptions;
         $this->CreateNewPackageCards = $CreateNewPackageCards;
         $this->DeleteParcels = $DeleteParcels;
         $this->GetTrackingEvents = $GetTrackingEvents;
-
-        $this->getBoxDimensions();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBoxDimensions()
-    {
-        $parcels = $this->getConfigData('parcels');
-
-        foreach ($parcels as $item) {
-            $this->packer->addBox(
-                new Box(
-                    $item['parcel_name'],
-                    $item['outer_width'],
-                    $item['outer_length'],
-                    $item['outer_depth'],
-                    $item['empty_weight'],
-                    $item['inner_width'],
-                    $item['inner_length'],
-                    $item['inner_depth'],
-                    $item['max_weight']
-                )
-            );
-        }
     }
 
     /**
@@ -333,19 +305,68 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      */
     public function getTracking($trackings)
     {
-        return $this->GetTrackingEvents->getResult($trackings);
+        if (!is_array($trackings)) {
+            $trackings = [$trackings];
+        }
+      
+        $return    = $this->_trackFactory->create();
+        $resultArr = [];
+      
+        foreach ($trackings as $trackingCode) {
+            $trackModel = $this->trackCollection->addFieldToFilter('track_number', $trackingCode)->getFirstItem();
+            $orderId = $trackModel->getOrderId();
+            $shipfunkResponse = $this->GetTrackingEvents->setTrackingCode($trackingCode)->setOrderId($orderId)->execute();
+            $result = json_decode($shipfunkResponse->getBody());
+            $this->_debug($result);
+            if (isset($result->Error) || isset($result->Info)) {
+                $error = $this->_trackErrorFactory->create();
+                $error->setCarrier($this->_code);
+                $error->setCarrierTitle($this->getConfigData('title'));
+                $error->setTracking($trackingCode);
+                if (isset($result->Error)) {
+                  $message = $result->Error->Message;
+                } else {
+                  $message = $result->Info->Message;
+                }
+                $error->setErrorMessage("Shipfunk Error (GetTrackingEvents) : " . $message);
+                $return->append($error);
+            } else {
+                $dataCollection = [];
+                foreach ($result->response->tracked as $tracked) {
+                    foreach ($tracked->Events as $event) {
+                        $data = [
+                            'activity'         => $event->TrackingDescription,
+                            'deliverydate'     => $event->TrackingDate,
+                            'deliverytime'     => $event->TrackingTime,
+                            'deliverylocation' => $event->TrackingPlace,
+                        ];
+                        $dataCollection[] = $data;
+                    }
+                    $progress['progressdetail'] = $dataCollection;
+                    //$progress['carrier']        = $trackingCarrier;
+                    $progress['title']          = $tracked->ServiceName;
+                    $resultArr[$trackingCode] = $progress;
+                }
+            }
+        }
+      
+        foreach ($resultArr as $trackNum => $data) {
+            $tracking = $this->_trackStatusFactory->create();
+            $tracking->setCarrier($this->_code);
+            $tracking->setCarrierTitle($data['title']);
+            $tracking->setTracking($trackNum);
+            $tracking->addData($data);
+            $return->append($tracking);
+        }
+
+        return $return;
     }
-
-    /**
-     * @param $orderId
-     *
-     * @return $this
-     */
-    public function deleteParcels($orderId)
+  
+    public function requestToShipment($request)
     {
-        $this->DeleteParcels->setOrderId($orderId)->removeAllParcels();
-
-        return $this;
+        $orderId = $request->getOrderShipment()->getOrder()->getRealOrderId();
+        $this->DeleteParcels->setOrderId($orderId)->execute();
+        return parent::requestToShipment($request);
     }
 
     /**
@@ -401,19 +422,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      */
     public function getContainerTypes(DataObject $params = null)
     {
-
-        $boxPackerBoxes = $this->packer->getBoxes();
-        $boxes = [''];
-
-        while (!$boxPackerBoxes->isEmpty()) {
-            $box = $boxPackerBoxes->extract();
-
-            if (!in_array($box->getReference(), $boxes)) {
-                $boxes[] = $box->getReference();
-            }
-        }
-
-        return $boxes;
+        return [];
     }
 
     /**
