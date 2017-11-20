@@ -24,8 +24,7 @@
                 <sallowspecific>0</sallowspecific>
                 <specificcountry>FI</specificcountry>
                 <showmethod>0</showmethod>
-                <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.
-                </specificerrmsg>
+                <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
                 <weight_mapping>weight</weight_mapping>
                 <weight_unit>kg</weight_unit>
                 <weight_default>1</weight_default>

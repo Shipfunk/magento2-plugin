@@ -3,37 +3,15 @@
 namespace Nord\Shipfunk\Model\Carrier;
 
 use Magento\Backend\App\Area\FrontNameResolver;
-use Magento\Catalog\Model\ProductRepository;
-use Magento\CatalogInventory\Api\StockRegistryInterface;
-use Magento\Directory\Helper\Data;
-use Magento\Directory\Model\CountryFactory;
-use Magento\Directory\Model\CurrencyFactory;
-use Magento\Directory\Model\RegionFactory;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\State;
 use Magento\Framework\DataObject;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Xml\Security;
-use Magento\Quote\Api\Data\ShippingMethodExtension;
 use Magento\Quote\Model\Quote\Address\RateRequest;
-use Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory;
-use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
-use Magento\Quote\Model\Quote\Item as cartItem;
 use Magento\Shipping\Model\Carrier\AbstractCarrierOnline;
-use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Magento\Shipping\Model\Rate\Result;
-use Magento\Shipping\Model\Rate\ResultFactory;
-use Magento\Shipping\Model\Shipment\Request;
-use Magento\Shipping\Model\Simplexml\ElementFactory;
-use Magento\Shipping\Model\Tracking\Result\ErrorFactory as TrackErrorFactory;
-use Magento\Shipping\Model\Tracking\Result\StatusFactory;
-use Magento\Shipping\Model\Tracking\ResultFactory as TrackFactory;
 use Nord\Shipfunk\Model\Api\Shipfunk\CreateNewPackageCards;
 use Nord\Shipfunk\Model\Api\Shipfunk\DeleteParcels;
 use Nord\Shipfunk\Model\Api\Shipfunk\GetDeliveryOptions;
 use Nord\Shipfunk\Model\Api\Shipfunk\GetTrackingEvents;
-use Nord\Shipfunk\Helper\ParcelHelper;
 use Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection;
 
 /**
@@ -41,7 +19,7 @@ use Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection;
  *
  * @package Nord\Shipfunk\Model\Carrier
  */
-class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
+class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\Carrier\CarrierInterface
 {
     /**
      * Code
@@ -49,11 +27,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      * @var string
      */
     protected $_code = 'shipfunk';
-
-    /**
-     * @var ProductRepository
-     */
-    protected $_productRepo;
 
     /**
      * @var GetDeliveryOptions
@@ -71,11 +44,6 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     protected $GetTrackingEvents;
 
     /**
-     * @var ParcelHelper
-     */
-    protected $parcelHelper;
-
-    /**
      * @var State
      */
     protected $_state;
@@ -84,12 +52,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      * @var DeleteParcels
      */
     protected $DeleteParcels;
-
-    /**
-     * @var ShippingMethodExtension
-     */
-    protected $shippingMethodExtension;
-  
+ 
     /**
      * @var \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection
      */
@@ -98,54 +61,49 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     /**
      * Shipfunk constructor.
      *
-     * @param ErrorFactory            $rateErrorFactory
-     * @param ResultFactory           $rateFactory
-     * @param MethodFactory           $rateMethodFactory
-     * @param Context                 $context
-     * @param Security                $xmlSecurity
-     * @param ElementFactory          $xmlElFactory
-     * @param ProductRepository       $productRepo
-     * @param GetDeliveryOptions      $GetDeliveryOptions
-     * @param CreateNewPackageCards   $CreateNewPackageCards
-     * @param ParcelHelper            $parcelHelper
-     * @param State                   $state
-     * @param TrackFactory            $trackFactory
-     * @param TrackErrorFactory       $trackErrorFactory
-     * @param StatusFactory           $trackStatusFactory
-     * @param RegionFactory           $regionFactory
-     * @param CountryFactory          $countryFactory
-     * @param CurrencyFactory         $currencyFactory
-     * @param Data                    $directoryData
-     * @param StockRegistryInterface  $stockRegistry
-     * @param GetTrackingEvents       $GetTrackingEvents
-     * @param DeleteParcels           $DeleteParcels
-     * @param ShippingMethodExtension $shippingMethodExtension
+     * @param \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory
+     * @param \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory
+     * @param \Magento\Framework\App\Helper\Context                 $context
+     * @param \Magento\Framework\Xml\Security                       $xmlSecurity
+     * @param \Magento\Shipping\Model\Simplexml\ElementFactory      $xmlElFactory,
+     * @param \Magento\Shipping\Model\Rate\ResultFactory            $rateFactory,
+     * @param \Magento\Shipping\Model\Tracking\ResultFactory        $trackFactory
+     * @param \Magento\Shipping\Model\Tracking\Result\ErrorFactory  $trackErrorFactory
+     * @param \Magento\Shipping\Model\Tracking\Result\StatusFactory $trackStatusFactory
+     * @param \Magento\Directory\Model\RegionFactory                $regionFactory
+     * @param \Magento\Directory\Model\CountryFactory               $countryFactory
+     * @param \Magento\Directory\Model\CurrencyFactory              $currencyFactory
+     * @param \Magento\Directory\Helper\Data                        $directoryData
+     * @param \Magento\CatalogInventory\Api\StockRegistryInterface  $stockRegistry
+     * @param GetDeliveryOptions                                    $GetDeliveryOptions
+     * @param CreateNewPackageCards                                 $CreateNewPackageCards
+     * @param Data                                                  $helper
+     * @param State                                                 $state
+     * @param GetTrackingEvents                                     $GetTrackingEvents
+     * @param DeleteParcels                                         $DeleteParcels
      * @param \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection $trackCollection
-     * @param array                   $data
+     * @param array                                                 $data
      */
     public function __construct(
-        ErrorFactory $rateErrorFactory,
-        ResultFactory $rateFactory,
-        MethodFactory $rateMethodFactory,
-        Context $context,
-        Security $xmlSecurity,
-        ElementFactory $xmlElFactory,
-        ProductRepository $productRepo,
+        \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory,
+        \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
+        \Magento\Framework\App\Helper\Context $context,
+        \Magento\Framework\Xml\Security $xmlSecurity,
+        \Magento\Shipping\Model\Simplexml\ElementFactory $xmlElFactory,
+        \Magento\Shipping\Model\Rate\ResultFactory $rateFactory,
+        \Magento\Shipping\Model\Tracking\ResultFactory $trackFactory,
+        \Magento\Shipping\Model\Tracking\Result\ErrorFactory $trackErrorFactory,
+        \Magento\Shipping\Model\Tracking\Result\StatusFactory $trackStatusFactory,
+        \Magento\Directory\Model\RegionFactory $regionFactory,
+        \Magento\Directory\Model\CountryFactory $countryFactory,
+        \Magento\Directory\Model\CurrencyFactory $currencyFactory,
+        \Magento\Directory\Helper\Data $directoryData,
+        \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
         GetDeliveryOptions $GetDeliveryOptions,
         CreateNewPackageCards $CreateNewPackageCards,
-        ParcelHelper $parcelHelper,
         State $state,
-        TrackFactory $trackFactory,
-        TrackErrorFactory $trackErrorFactory,
-        StatusFactory $trackStatusFactory,
-        RegionFactory $regionFactory,
-        CountryFactory $countryFactory,
-        CurrencyFactory $currencyFactory,
-        Data $directoryData,
-        StockRegistryInterface $stockRegistry,
         GetTrackingEvents $GetTrackingEvents,
         DeleteParcels $DeleteParcels,
-        ShippingMethodExtension $shippingMethodExtension,
         \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection $trackCollection,
         array $data = []
     ) {
@@ -168,10 +126,7 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
             $data
         );
         
-        $this->_productRepo = $productRepo;
         $this->_state = $state;
-        $this->parcelHelper = $parcelHelper;
-        $this->shippingMethodExtension = $shippingMethodExtension;
         $this->trackCollection = $trackCollection;
         $this->GetDeliveryOptions = $GetDeliveryOptions;
         $this->CreateNewPackageCards = $CreateNewPackageCards;
@@ -221,56 +176,26 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
      */
     public function collectRates(RateRequest $request)
     {
-        if (!$this->isActive()) {
-            return false;
+        if (!$this->canCollectRates()) {
+            return $this->getErrorMessage();
         }
 
         $result = $this->_rateFactory->create();
-        $products = $this->parcelHelper->parseProducts($request);
-        $shipfunkResponse = $this->GetDeliveryOptions
-                                ->setProducts($products)
-                                ->setRequest($request)
-                                ->execute();
-
+        $shipfunkResponse = $this->GetDeliveryOptions->setRequest($request)->execute();
         $shippingMethods = json_decode($shipfunkResponse->getBody());
-
-        /**
-         * if ($shippingMethods->Error) {
-         * $error = $this->_rateErrorFactory->create(
-         * [
-         * 'data' => [
-         * 'carrier'       => $this->_code,
-         * 'carrier_title' => $this->getConfigData('title'),
-         * 'error_message' => $shippingMethods->Error->Message,
-         * ],
-         * ]
-         * );
-         * $result->append($error);
-         *
-         * return $result;
-         * }
-         */
-
         $this->_debug($shippingMethods);
-        //$this->getSession()->getQuote()->setExtShippingInfo(json_encode($shippingMethods->response));
-        //$this->getSession()->getQuote()->save();
         if (isset($shippingMethods->Error)) {
-            return $result;
+            return $this->getErrorMessage();
         }
         if (isset($shippingMethods) && isset($shippingMethods->response)) {
             foreach ($shippingMethods->response as $carrierCode => $carrier) {
                 foreach ($carrier->Options as $carrierOption) {
                     $method = $this->_rateMethodFactory->create();
                     $method->setCarrier('shipfunk');
-                    $method->setMethod(
-                        $carrier->Carriercode.'_'.$carrierOption->carriercode
-                    );
+                    $method->setMethod($carrier->Carriercode.'_'.$carrierOption->carriercode);
                     // not visible anywhere but saved in database quote_shipping_rate
-                    // to add it on frontend needs plugin on Magento\Quote\Model\Cart\ShippingMethodConverter::modelToDataObject  and possibly extension_attribute for Magento\Quote\Api\Data\ShippingMethodInterface
-
-                    $method->setMethodDescription(
-                        $carrierOption->info."||".$carrierOption->category."||".$carrierOption->delivtime . " ".__('days')
-                    );
+                    // to add it on frontend has plugin on Magento\Quote\Model\Cart\ShippingMethodConverter::modelToDataObject and extension_attribute for Magento\Quote\Api\Data\ShippingMethodInterface
+                    $method->setMethodDescription($carrierOption->info."||".$carrierOption->category."||".$carrierOption->delivtime . " ".__('days'));
                     $method->setCarrierTitle($carrier->Companyname);
                     $method->setMethodTitle($carrierOption->productname);
                     $method->setPrice($carrierOption->customer_price);
@@ -423,18 +348,5 @@ class Shipfunk extends AbstractCarrierOnline implements CarrierInterface
     public function getContainerTypes(DataObject $params = null)
     {
         return [];
-    }
-
-    /**
-     * Load product from productId
-     *
-     * @param string $id
-     *
-     * @return $this
-     */
-    protected function getProductById($id)
-    {
-        return $this->_productRepo
-            ->getById($id);
     }
 }

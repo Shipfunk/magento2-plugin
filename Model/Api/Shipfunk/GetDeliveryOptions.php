@@ -70,16 +70,16 @@ class GetDeliveryOptions extends AbstractEndpoint
                     'language' => $this->_getLanguageCode(),
                     'monetary' => [
                         'currency' => $request->getPackageCurrency()->getCurrencyCode(),
-                        'value' => $this->_priceHelper->currency($request->getBaseSubtotalInclTax(), false, false) // @todo BUG WITH DIFFERENT BASE CURRENCY
+                        'value' => $this->_priceHelper->currency($request->getBaseSubtotalInclTax(), false, false)
                     ],
-                    'get_pickups' => [ // get stores and carriers but without carrier pickup points
+                    'get_pickups' => [
                         'store' => 1,
                         'store_only' => 0,
                         'transport_company' => 0
                     ],
-                    'products' => $this->getProducts()
+                    'products' => $this->_getProducts($request)
                 ],
-                'customer' => [ // we'll be sending the rest later
+                'customer' => [
                     'postal_code'     => $request->getDestPostcode(),
                     'country'         => $request->getDestCountryId()
                 ]
@@ -93,5 +93,51 @@ class GetDeliveryOptions extends AbstractEndpoint
                       ->post($query);
       
         return $result;
+    }
+  
+    /*
+     * @param RateRequest $request
+     * @return array
+     */
+    protected function _getProducts($request)
+    {
+        $products = [];
+        foreach ($request->getAllItems() as $item) {
+            // get the info only from child products, since dimensions and weight might be different based on configuration
+            if ($item->getHasChildren()) {
+                continue;
+            }
+            $product = $item->getProduct();
+            if (!$product->isVirtual()) {
+                $products[] = [
+                    'amount' => $item->getQty(),
+                    'code' => $product->getSku(),
+                    'name' => $product->getName(),
+                    'weight'     => [
+                        'unit'  => $this->helper->getConfigData('weight_unit'),
+                        'amount'  => $this->_getProductValue($product, 'weight')
+                    ],
+                    'dimensions'     => [
+                        'unit' => $this->helper->getConfigData('dimensions_unit'),
+                        'width' => $this->_getProductValue($product, 'width'),
+                        'depth' => $this->_getProductValue($product, 'depth'),
+                        'height' => $this->_getProductValue($product, 'height')
+                    ]
+                ];
+            }
+        }
+      
+        return $products;
+    }
+  
+    /**
+     * @return mixed
+     */
+    protected function _getProductValue($product, $attribute)
+    {
+        $mageAttribute = $this->helper->getConfigData($attribute . '_mapping');
+        $attributeValue = $product->getData($mageAttribute);
+        $value = is_numeric($attributeValue) && $attributeValue ? $attributeValue : $this->helper->getConfigData($attribute . '_default');
+        return $value;
     }
 }

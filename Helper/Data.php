@@ -1,10 +1,10 @@
 <?php
 namespace Nord\Shipfunk\Helper;
 
-use Magento\Framework\App\Helper\AbstractHelper,
-    Magento\Store\Api\StoreResolverInterface,
-    Magento\Framework\App\Helper\Context,
-    Magento\Store\Model\ScopeInterface;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Store\Api\StoreResolverInterface;
+use Magento\Framework\App\Helper\Context;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Class Data
