@@ -1,11 +1,8 @@
 <?php /** @var \Nord\Shipfunk\Block\Adminhtml\Order\View\Custom $block */ ?>
 <?php if ($block->hasPickupInformation()) { ?>
 <div id="shippingPickupInformation">
-    <div class="admin__page-section-item-title">
-        <span class="title"><?= /* @escapeNotVerified */ __('Pickup Point') ?></span>
-    </div>
     <div class="admin__page-section-item">
-        <strong class="admin__page-section-item-content"><?= $block->getPickupInformation() ?></strong>
+        <?= $block->escapeHtml($block->getPickupInformation(), ['br']) ?>
     </div>
 </div>
 <script>

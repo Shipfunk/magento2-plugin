@@ -32,6 +32,11 @@ class Custom extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
      */
     public function getPickupInformation()
     {
-        return $this->escapeHtml($this->pickup->getPickupName());
+        return implode("<br>", [
+              $this->pickup->getPickupName(),
+              $this->pickup->getPickupAddress(),
+              $this->pickup->getPickupPostcode(),
+              $this->pickup->getPickupCity()
+            ]) ;
     }
 }

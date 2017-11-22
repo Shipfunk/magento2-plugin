@@ -45,7 +45,12 @@ class Pickup extends \Magento\Framework\View\Element\Template
         // @todo should be rewriten not to use load() but either a resource-load or collection
         $orderSelectedPickup = $this->orderSelectedPickupFactory->create()->load($order->getId(), 'order_id');
         if ($orderSelectedPickup) {
-            return $orderSelectedPickup->getPickupName();
+            return implode("<br>", [
+              $orderSelectedPickup->getPickupName(),
+              $orderSelectedPickup->getPickupAddress(),
+              $orderSelectedPickup->getPickupPostcode(),
+              $orderSelectedPickup->getPickupCity()
+            ]) ;
         }
         
         return '';
