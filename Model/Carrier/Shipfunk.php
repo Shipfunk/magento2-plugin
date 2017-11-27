@@ -9,7 +9,6 @@ use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Carrier\AbstractCarrierOnline;
 use Magento\Shipping\Model\Rate\Result;
 use Nord\Shipfunk\Model\Api\Shipfunk\CreateNewPackageCards;
-use Nord\Shipfunk\Model\Api\Shipfunk\DeleteParcels;
 use Nord\Shipfunk\Model\Api\Shipfunk\GetDeliveryOptions;
 use Nord\Shipfunk\Model\Api\Shipfunk\GetTrackingEvents;
 use Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection;
@@ -49,11 +48,6 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
     protected $_state;
 
     /**
-     * @var DeleteParcels
-     */
-    protected $DeleteParcels;
- 
-    /**
      * @var \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection
      */
     protected $trackCollection;
@@ -80,7 +74,6 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
      * @param Data                                                  $helper
      * @param State                                                 $state
      * @param GetTrackingEvents                                     $GetTrackingEvents
-     * @param DeleteParcels                                         $DeleteParcels
      * @param \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection $trackCollection
      * @param array                                                 $data
      */
@@ -103,7 +96,6 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
         CreateNewPackageCards $CreateNewPackageCards,
         State $state,
         GetTrackingEvents $GetTrackingEvents,
-        DeleteParcels $DeleteParcels,
         \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection $trackCollection,
         array $data = []
     ) {
@@ -130,7 +122,6 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
         $this->trackCollection = $trackCollection;
         $this->GetDeliveryOptions = $GetDeliveryOptions;
         $this->CreateNewPackageCards = $CreateNewPackageCards;
-        $this->DeleteParcels = $DeleteParcels;
         $this->GetTrackingEvents = $GetTrackingEvents;
     }
 
@@ -181,9 +172,20 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
         }
 
         $result = $this->_rateFactory->create();
-        $shipfunkResponse = $this->GetDeliveryOptions->setRequest($request)->execute();
-        $shippingMethods = json_decode($shipfunkResponse->getBody());
-        $this->_debug($shippingMethods);
+        
+        $requestString = $request->toJson();
+        $debugData = ['request' => $requestString];
+        $response = $this->_getCachedQuotes($requestString);
+        if ($response === null) {
+            $response = $this->GetDeliveryOptions->setRequest($request)->execute();
+            $this->_setCachedQuotes($requestString, $response->getBody());
+            $debugData['response'] = $response->getBody();
+            $shippingMethods = json_decode($response->getBody());
+        } else {
+            $debugData['response'] = $response;
+            $shippingMethods = json_decode($response);
+        }
+        $this->_debug($debugData);
         if (isset($shippingMethods->Error)) {
             return $this->getErrorMessage();
         }
@@ -242,7 +244,6 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
             $orderId = $trackModel->getOrderId();
             $shipfunkResponse = $this->GetTrackingEvents->setTrackingCode($trackingCode)->setOrderId($orderId)->execute();
             $result = json_decode($shipfunkResponse->getBody());
-            $this->_debug($result);
             if (isset($result->Error) || isset($result->Info)) {
                 $error = $this->_trackErrorFactory->create();
                 $error->setCarrier($this->_code);
@@ -286,13 +287,6 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
 
         return $return;
     }
-  
-    public function requestToShipment($request)
-    {
-        $orderId = $request->getOrderShipment()->getOrder()->getRealOrderId();
-        $this->DeleteParcels->setOrderId($orderId)->execute();
-        return parent::requestToShipment($request);
-    }
 
     /**
      * Sending the single CreateNewPackageCards API request for each Magento package
@@ -302,7 +296,6 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
     protected function _doShipmentRequest(DataObject $request)
     {
         $this->_prepareShipmentRequest($request);
-        $this->_debug(var_export($request->debug(), true));
         $orderId = $request->getOrderShipment()->getOrder()->getRealOrderId();
         $packages = [
           $request->getPackageId() => [
@@ -316,13 +309,12 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
                               ->setRequest($request)
                               ->execute();
         $shipfunkResponse = json_decode($shipfunkResponse->getBody());
-        $this->_debug($shipfunkResponse);
       
         $response = new DataObject();
         if (isset($shipfunkResponse->Error)) {
           $response->setError(true);
           // $errorMessage = __("shipfunk_error_7");
-          $response->setErrors($shipfunkResponse->Error->Message); // @todo Check if error messages are returned in correct language
+          $response->setErrors($shipfunkResponse->Error->Message);
           $response->setMessage($shipfunkResponse->Error->Message);
         } else {
            if (isset($shipfunkResponse->response) && isset($shipfunkResponse->response->parcels)) {

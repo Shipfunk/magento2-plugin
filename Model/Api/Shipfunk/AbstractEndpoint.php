@@ -18,7 +18,7 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     /**
      * @var LoggerInterface
      */
-    protected $log;
+    protected $_logger;
 
     /**
      * @var ShipfunkDataHelper
@@ -43,7 +43,7 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
         ZendClientFactory $httpClientFactory
     ) {
         $this->helper         = $shipfunkDataHelper;
-        $this->log            = $logger;
+        $this->_logger            = $logger;
         $this->_httpClientFactory = $httpClientFactory;
       
         $this->setHeaders([
@@ -97,16 +97,17 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     protected function post($requestData)
     {
         $data = ['sf_' . $this->getEndpoint() => $requestData];
-        $this->log->debug(var_export($data, true));
+        $url = (string) $this->getApiUrl();
+        $headers = $this->getHeaders();
+        $debugData = ['request' => $data, 'url' => $url, 'headers' => $headers];
         $client = $this->_httpClientFactory->create();
-        $client->setUri((string) $this->getApiUrl());
+        $client->setUri($url);
         $client->setConfig(['maxredirects' => 0, 'timeout' => 30]);
-        $client->setHeaders($this->getHeaders());
+        $client->setHeaders($headers);
         $client->setParameterPost($data);
-        $this->log->debug(var_export($this->getHeaders(), true));
-        $this->log->debug(var_export($this->getApiUrl(), true));
         $result = $client->request(\Magento\Framework\HTTP\ZendClient::POST);
-      
+        $debugData['response'] = $result->getBody();
+        $this->_debug($debugData);
         return $result;
     }
 
@@ -118,16 +119,40 @@ abstract class AbstractEndpoint extends \Magento\Framework\DataObject
     protected function get($requestData)
     {
         $data = ['sf_' . $this->getEndpoint() => $requestData];
-        $this->log->debug(var_export($data, true));
+        $url = (string) $this->getApiUrl();
+        $headers = $this->getHeaders();
+        $debugData = ['request' => $data, 'url' => $url, 'headers' => $headers];
         $client = $this->_httpClientFactory->create();
-        $client->setUri((string) $this->getApiUrl());
+        $client->setUri($url);
         $client->setConfig(['maxredirects' => 0, 'timeout' => 30]);
-        $client->setHeaders($this->getHeaders());
+        $client->setHeaders($headers);
         $client->setParameterGet($data);
-        $this->log->debug(var_export($this->getHeaders(), true));
-        $this->log->debug(var_export($this->getApiUrl(), true));
         $result = $client->request(\Magento\Framework\HTTP\ZendClient::GET);
-      
+        $debugData['response'] = $result->getBody();
+        $this->_debug($debugData);
         return $result;
+    }
+  
+    /**
+     * Log debug data to file
+     *
+     * @param mixed $debugData
+     * @return void
+     */
+    protected function _debug($debugData)
+    {
+        if ($this->getDebugFlag()) {
+            $this->_logger->debug(var_export($debugData, true));
+        }
+    }
+
+    /**
+     * Define if debugging is enabled
+     *
+     * @return bool
+     */
+    public function getDebugFlag()
+    {
+        return $this->helper->getConfigData('debug');
     }
 }

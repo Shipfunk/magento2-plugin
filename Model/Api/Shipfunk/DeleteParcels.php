@@ -15,14 +15,18 @@ class DeleteParcels extends AbstractEndpoint
           $query = [
              'query' => [
                 'order' => [
-                    'remove_all_parcels' => 1
+                    'remove_all_parcels' => 0,
+                    'return_parcels' => 1,
+                    'parcels' => [
+                      ['tracking_code' => $this->getTrackingCode()]
+                    ]
                 ]
              ]
           ];
         }
     
         $query = utf8_encode(json_encode($query));
-        $result = $this->setEndpoint('delete_parcels')->get($query);
+        $result = $this->setEndpoint('delete_parcels')->post($query);
       
         return $result;
     }
