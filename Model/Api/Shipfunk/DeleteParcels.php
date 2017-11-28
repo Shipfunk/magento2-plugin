@@ -15,7 +15,7 @@ class DeleteParcels extends AbstractEndpoint
           $query = [
              'query' => [
                 'order' => [
-                    'remove_all_parcels' => 0,
+                    'remove_all_parcels' => (int) $this->getRemoveAll(),
                     'return_parcels' => 1,
                     'parcels' => [
                       ['tracking_code' => $this->getTrackingCode()]

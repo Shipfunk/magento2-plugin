@@ -22,30 +22,76 @@ class InstallSchema implements InstallSchemaInterface
         $setup->startSetup();
 
         $table = $setup->getConnection()
-            ->newTable($setup->getTable('nord_shipfunk_pickups'))
+            ->newTable($setup->getTable('quote_selected_pickup'))
             ->addColumn(
-                'id',
-                Table::TYPE_INTEGER,
+                'selected_pickup_id',
+                Table::TYPE_SMALLINT,
                 null,
-                ['identity' => true, 'nullable' => false, 'primary' => true]
+                ['identity' => true, 'nullable' => false, 'primary' => true],
+                'Identifier'
             )
-            ->addColumn('pickup_id', Table::TYPE_TEXT, null, ['nullable' => false])
-            ->addColumn('pickup', Table::TYPE_TEXT, null, ['nullable' => false]);
-
+            ->addColumn('pickup_name', Table::TYPE_TEXT, 255, ['nullable' => false])
+            ->addColumn('pickup_addr', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_postal', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_city', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_country', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_id', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_openinghours', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_openinghours_excep', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('quote_id', Table::TYPE_INTEGER, null, ['unsigned' => true, 'nullable' => false], 'Quote ID')
+            ->addIndex($setup->getIdxName('quote_selected_pickup', ['quote_id']), ['quote_id'])
+            ->addIndex(
+                $setup->getIdxName(
+                    'quote_cgi_delivery_terms',
+                    ['quote_id', 'pickup_id'],
+                    \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+                ),
+                ['quote_id', 'pickup_id'],
+                ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
+            )->addForeignKey(
+                $setup->getFkName('quote_selected_pickup', 'quote_id', 'quote', 'entity_id'),
+                'quote_id',
+                $setup->getTable('quote'),
+                'entity_id',
+                \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
+            )->setComment('Quote Selected Pickup');
         $setup->getConnection()->createTable($table);
 
 
         $table = $setup->getConnection()
-            ->newTable($setup->getTable('nord_shipfunk_selected_pickup'))
+            ->newTable($setup->getTable('sales_order_selected_pickup'))
             ->addColumn(
-                'id',
-                Table::TYPE_INTEGER,
+                'selected_pickup_id',
+                Table::TYPE_SMALLINT,
                 null,
-                ['identity' => true, 'nullable' => false, 'primary' => true]
+                ['identity' => true, 'nullable' => false, 'primary' => true],
+                'Identifier'
             )
-            ->addColumn('quote_id', Table::TYPE_INTEGER, null, ['nullable' => false])
-            ->addColumn('pickup_id', Table::TYPE_TEXT, null, ['nullable' => false]);
-
+            ->addColumn('pickup_name', Table::TYPE_TEXT, 255, ['nullable' => false])
+            ->addColumn('pickup_addr', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_postal', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_city', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_country', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_id', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_openinghours', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('pickup_openinghours_excep', Table::TYPE_TEXT, 255, ['nullable' => true])
+            ->addColumn('order_id', Table::TYPE_INTEGER, null, ['unsigned' => true, 'nullable' => false], 'Order ID')
+            ->addIndex($setup->getIdxName('sales_order_selected_pickup', ['order_id']), ['order_id'])
+            ->addIndex(
+                $setup->getIdxName(
+                    'sales_order_selected_pickup',
+                    ['order_id', 'pickup_id'],
+                    \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+                ),
+                ['order_id', 'pickup_id'],
+                ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
+            )->addForeignKey(
+                $setup->getFkName('sales_order_selected_pickup', 'order_id', 'sales_order', 'entity_id'),
+                'order_id',
+                $setup->getTable('sales_order'),
+                'entity_id',
+                \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
+            )->setComment('Order Selected Pickup');
         $setup->getConnection()->createTable($table);
 
         $setup->endSetup();
