@@ -15,6 +15,7 @@ bin/magento setup:static-content:deploy
 bin/magento module:disable Nord_Shipfunk --clear-static-content
 bin/magento module:uninstall Nord_Shipfunk --clear-static-content
 bin/magento setup:static-content:deploy
+composer remove nord/module-shipfunk
 ```
 
 
@@ -33,4 +34,16 @@ bin/magento setup:static-content:deploy
 bin/magento module:disable Nord_Shipfunk --clear-static-content
 rm -rf app/code/Nord/Shipfunk
 bin/magento setup:static-content:deploy
+```
+
+database cleanup
+-------------------------
+
+If desired, execute these queries to remove database content produced by Shipfunk module
+
+```sql
+USE your_database_name:
+DROP TABLE quote_selected_pickup;
+DROP TABLE sales_order_selected_pickup;
+DELETE FROM eav_attribute WHERE attribute_code LIKE 'shipfunk_%';
 ```
