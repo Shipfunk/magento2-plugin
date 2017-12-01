@@ -8,15 +8,17 @@ cd MAGE2_ROOT_DIR
 ## INSTALL
 composer config repositories.nord_shipfunk git git@github.com:Shipfunk/magento2-plugin.git
 composer require nord/module-shipfunk:dev-master
-bin/magento module:enable Nord_Shipfunk --clear-static-content
+bin/magento module:enable Nord_Shipfunk
 bin/magento setup:upgrade
 bin/magento setup:di:compile
 bin/magento setup:static-content:deploy
 ## UNINSTALL
-bin/magento module:disable Nord_Shipfunk --clear-static-content
-bin/magento module:uninstall Nord_Shipfunk --clear-static-content
-bin/magento setup:static-content:deploy
+bin/magento module:disable Nord_Shipfunk
+bin/magento module:uninstall Nord_Shipfunk
 composer remove nord/module-shipfunk
+composer config --unset repositories.nord_shipfunk
+bin/magento setup:di:compile
+bin/magento setup:static-content:deploy
 ```
 
 
@@ -28,13 +30,14 @@ Download zip package from [here](https://github.com/Shipfunk/magento2-plugin/arc
 ```bash
 cd MAGE2_ROOT_DIR
 ## INSTALL
-bin/magento module:enable Nord_Shipfunk --clear-static-content
+bin/magento module:enable Nord_Shipfunk
 bin/magento setup:upgrade
 bin/magento setup:di:compile
 bin/magento setup:static-content:deploy
 ## UNINSTALL
-bin/magento module:disable Nord_Shipfunk --clear-static-content
+bin/magento module:disable Nord_Shipfunk
 rm -rf app/code/Nord/Shipfunk
+bin/magento setup:di:compile
 bin/magento setup:static-content:deploy
 ```
 
