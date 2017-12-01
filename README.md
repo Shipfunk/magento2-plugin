@@ -22,7 +22,7 @@ composer remove nord/module-shipfunk
 zip package
 ------------------------
 
-Download zip package from [here](https://github.com/Shipfunk/magento2-plugin/archive/master.zip) and unzip into your *app/code/* folder.
+Download zip package from [here](https://github.com/Shipfunk/magento2-plugin/archive/master.zip) and unzip into your *app/code/Nord/Shipfunk/* folder.
 
 ```bash
 cd MAGE2_ROOT_DIR
