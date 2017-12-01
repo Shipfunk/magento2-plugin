@@ -44,7 +44,7 @@ database cleanup
 If desired, execute these queries to remove database content produced by Shipfunk module
 
 ```sql
-USE your_database_name:
+USE your_database_name;
 DROP TABLE quote_selected_pickup;
 DROP TABLE sales_order_selected_pickup;
 DELETE FROM eav_attribute WHERE attribute_code LIKE 'shipfunk_%';
