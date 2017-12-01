@@ -48,4 +48,5 @@ USE your_database_name;
 DROP TABLE quote_selected_pickup;
 DROP TABLE sales_order_selected_pickup;
 DELETE FROM eav_attribute WHERE attribute_code LIKE 'shipfunk_%';
+DELETE FROM setup_module WHERE module='Nord_Shipfunk';
 ```
