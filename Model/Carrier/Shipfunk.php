@@ -299,9 +299,12 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
   
     public function requestToShipment($request)
     {
-        $orderId = $request->getOrderShipment()->getOrder()->getRealOrderId();
-        $this->DeleteParcels->setOrderId($orderId)->setRemoveAll(true)->execute();
-        // @todo remove all tracking codes also
+        $tracksCollection = $this->trackCollection->setShipmentFilter($request->getOrderShipment()->getId());
+        foreach ($tracksCollection as $track) {
+          // triggers TrackingDeleteBeforeObserver
+          $track->delete();
+        }
+        
         return parent::requestToShipment($request);
     }
 
