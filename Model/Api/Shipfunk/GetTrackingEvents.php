@@ -51,7 +51,10 @@ class GetTrackingEvents extends AbstractEndpoint
              'query' => [
                 'order' => [
                     'tracking_code' => $trackingCode,
-                    'language' => $this->_getLanguageCode()
+                    'language' => $this->_getLanguageCode(),
+                    'carrier' => [
+                        'carriercode' => $this->getCarrierOptionCode()
+                    ]
                 ]
              ]
           ];

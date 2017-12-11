@@ -250,8 +250,10 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
       
         foreach ($trackings as $trackingCode) {
             $trackModel = $this->trackCollection->addFieldToFilter('track_number', $trackingCode)->getFirstItem();
-            $orderId = $trackModel->getOrderId();
-            $shipfunkResponse = $this->GetTrackingEvents->setTrackingCode($trackingCode)->setOrderId($orderId)->execute();
+            $order = $trackModel->getShipment()->getOrder();
+            list($method, $carrierCode, $carrierOptionCode) = explode('_', $order->getShippingMethod(), 3);
+            $orderId = $order->getRealOrderId();
+            $shipfunkResponse = $this->GetTrackingEvents->setTrackingCode($trackingCode)->setCarrierOptionCode($carrierOptionCode)->setOrderId($orderId)->execute();
             $result = json_decode($shipfunkResponse->getBody());
             if (isset($result->Error) || isset($result->Info)) {
                 $error = $this->_trackErrorFactory->create();
