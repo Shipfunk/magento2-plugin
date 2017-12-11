@@ -25,7 +25,7 @@ class InstallSchema implements InstallSchemaInterface
             ->newTable($setup->getTable('quote_selected_pickup'))
             ->addColumn(
                 'selected_pickup_id',
-                Table::TYPE_SMALLINT,
+                Table::TYPE_INTEGER,
                 null,
                 ['identity' => true, 'nullable' => false, 'primary' => true],
                 'Identifier'
@@ -62,7 +62,7 @@ class InstallSchema implements InstallSchemaInterface
             ->newTable($setup->getTable('sales_order_selected_pickup'))
             ->addColumn(
                 'selected_pickup_id',
-                Table::TYPE_SMALLINT,
+                Table::TYPE_INTEGER,
                 null,
                 ['identity' => true, 'nullable' => false, 'primary' => true],
                 'Identifier'
