@@ -9,7 +9,6 @@ use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Carrier\AbstractCarrierOnline;
 use Magento\Shipping\Model\Rate\Result;
 use Nord\Shipfunk\Model\Api\Shipfunk\CreateNewPackageCards;
-use Nord\Shipfunk\Model\Api\Shipfunk\DeleteParcels;
 use Nord\Shipfunk\Model\Api\Shipfunk\GetDeliveryOptions;
 use Nord\Shipfunk\Model\Api\Shipfunk\GetTrackingEvents;
 use Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection;
@@ -42,11 +41,6 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
      * @var GetTrackingEvents
      */
     protected $GetTrackingEvents;
-  
-    /**
-     * @var DeleteParcels
-     */
-    protected $DeleteParcels;
 
     /**
      * @var State
@@ -80,7 +74,6 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
      * @param Data                                                  $helper
      * @param State                                                 $state
      * @param GetTrackingEvents                                     $GetTrackingEvents
-     * @param DeleteParcels                                         $DeleteParcels
      * @param \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection $trackCollection
      * @param array                                                 $data
      */
@@ -103,7 +96,6 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
         CreateNewPackageCards $CreateNewPackageCards,
         State $state,
         GetTrackingEvents $GetTrackingEvents,
-        DeleteParcels $DeleteParcels,
         \Magento\Sales\Model\ResourceModel\Order\Shipment\Track\Collection $trackCollection,
         array $data = []
     ) {
@@ -130,7 +122,6 @@ class Shipfunk extends AbstractCarrierOnline implements \Magento\Shipping\Model\
         $this->trackCollection = $trackCollection;
         $this->GetDeliveryOptions = $GetDeliveryOptions;
         $this->CreateNewPackageCards = $CreateNewPackageCards;
-        $this->DeleteParcels = $DeleteParcels;
         $this->GetTrackingEvents = $GetTrackingEvents;
     }
 
