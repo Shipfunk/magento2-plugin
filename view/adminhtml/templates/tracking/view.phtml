@@ -51,7 +51,7 @@
         <?php $i = 0; foreach ($_tracks as $_track):$i++ ?>
             <tr class="<?= /* @escapeNotVerified */ ($i%2 == 0) ? 'even' : 'odd' ?>">
                 <?php if ('shipfunk' == $_track->getCarrierCode()): ?>
-                  <?php $shippingDescriptionExplode = explode('-', $block->getShipment()->getOrder()->getShippingDescription()); ?>
+                  <?php $shippingDescriptionExplode = explode(' - ', $block->getShipment()->getOrder()->getShippingDescription(), 2); ?>
                   <td class="col-carrier"><?= $block->escapeHtml(trim($shippingDescriptionExplode[0])) ?></td>
                   <td class="col-title"><?= isset($shippingDescriptionExplode[1]) ? $block->escapeHtml(trim($shippingDescriptionExplode[1])) : '' ?></td>
                 <?php else: ?>
