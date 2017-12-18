@@ -2,54 +2,42 @@
 
 namespace Nord\Shipfunk\Observer;
 
-use Magento\Framework\Event\ObserverInterface,
-    Magento\Framework\Event\Observer,
-    Magento\Sales\Model\Order;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\ParcelHelper,
-    Nord\Shipfunk\Model\Api\Shipfunk\OrderPaid;
-use Psr\Log\LoggerInterface;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Event\Observer;
+use Nord\Shipfunk\Model\Api\Shipfunk\SetOrderStatus;
+use Nord\Shipfunk\Model\Order\SelectedPickupFactory;
 
 /**
  * Class CheckoutSubmitAllAfterObserver
  *
- * NOTE FROM SHIPFUNK: THIS WILL BE CALLED WHEN AN ORDER HAS BEEN MADE AND NOT WHEN AN ORDER HAS BEEN PAID!
- *                     THERE IS NO API TO SET AN ORDER AS PAID ANYMORE
- *
  * @package Nord\Shipfunk\Observer
+ * @todo Should we send final customer details to Shipfunk at this point ?
+ * @todo Should there be an button on order view, to manually send the SetOrderStatus API, in case it fails here.
  */
 class CheckoutSubmitAllAfterObserver implements ObserverInterface
 {
     /**
-     * @var LoggerInterface
+     * @var SetOrderStatus
      */
-    protected $log;
-
+    protected $SetOrderStatus;
+  
     /**
-     * @var OrderPaid
+     * @var \Nord\Shipfunk\Model\Order\SelectedPickupFactory
      */
-    protected $OrderPaid;
-
+    protected $orderSelectedPickupFactory;
+  
     /**
-     * @var ParcelHelper
-     */
-    protected $parcelHelper;
-
-    /**
-     * CheckoutSubmitAllAfterObserver constructor.
+     * constructor.
      *
-     * @param OrderPaid       $OrderPaid
-     * @param LoggerInterface $log
-     * @param ParcelHelper    $parcelHelper
+     * @param SelectedPickupFactory $orderSelectedPickupFactory
+     * @param SetOrderStatus       $SetOrderStatus
      */
     public function __construct(
-        OrderPaid $OrderPaid,
-        LoggerInterface $log,
-        ParcelHelper $parcelHelper
+        SelectedPickupFactory $orderSelectedPickupFactory,
+        SetOrderStatus $SetOrderStatus
     ) {
-        $this->parcelHelper = $parcelHelper;
-        $this->log          = $log;
-
-        $this->OrderPaid = $OrderPaid;
+        $this->orderSelectedPickupFactory = $orderSelectedPickupFactory;
+        $this->SetOrderStatus = $SetOrderStatus;
     }
 
     /**
@@ -57,12 +45,31 @@ class CheckoutSubmitAllAfterObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        /** @var Order $order */
-        /** @noinspection PhpUndefinedMethodInspection */
         $order = $observer->getEvent()->getOrder();
-
-        $this->OrderPaid
-            ->setOrder($order)
-            ->getResult();
+        $quote = $observer->getEvent()->getQuote();
+        // If set, copy the quote selected pickup info to order
+        $cartExtension = $quote->getExtensionAttributes();
+        if ($cartExtension) {
+            $quoteSelectedPickup = $cartExtension->getSelectedPickup();
+            if ($quoteSelectedPickup && $quoteSelectedPickup->getPickupName()) {
+                $orderSelectedPickup = $this->orderSelectedPickupFactory->create();
+                $orderSelectedPickup->setPickupName($quoteSelectedPickup->getPickupName())
+                                ->setPickupAddress($quoteSelectedPickup->getPickupAddress())
+                                ->setPickupPostcode($quoteSelectedPickup->getPickupPostcode())
+                                ->setPickupCity($quoteSelectedPickup->getPickupCity())
+                                ->setPickupCountry($quoteSelectedPickup->getPickupCountry())
+                                ->setPickupId($quoteSelectedPickup->getPickupId())
+                                ->setPickupOpeningHours($quoteSelectedPickup->getPickupOpeningHours())
+                                ->setPickupOpeningHoursException($quoteSelectedPickup->getPickupOpeningHoursException())
+                                ->setOrder($order)
+                                ->save();
+            }
+        }
+        // Send placed order status to Shipfunk 
+        $this->SetOrderStatus
+            ->setOrderId($order->getQuoteId())
+            ->setFinalOrderId($order->getRealOrderId())
+            ->setOrderStatus(SetOrderStatus::STATUS_PLACE)
+            ->execute();
     }
 }

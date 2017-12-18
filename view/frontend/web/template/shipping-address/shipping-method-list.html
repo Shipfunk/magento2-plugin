@@ -1,0 +1,24 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div id="checkout-shipping-method-load">
+    <table class="table-checkout-shipping-method">
+        <tbody>
+            <!--ko foreach: { data: categories(), as: 'cat'}-->
+                <!--ko if: ($parent.categories().length > 1 && cat != 'ZZZZZZ') -->
+                <tr class="row catHeader">
+                    <td colspan="6" data-bind="text:cat"></td>
+                </tr>
+                <!-- /ko -->
+                <!-- ko foreach: { data: $parent.rates(), as: 'method'} -->
+                    <!--ko if:(method.extension_attributes.category == cat || method.extension_attributes.category == 'DEFAULT'+cat) -->
+                        <!--ko template: { name: element.shippingMethodItemTemplate} --><!-- /ko -->
+                    <!-- /ko -->
+                <!-- /ko -->
+            <!-- /ko -->
+        </tbody>
+    </table>
+</div>

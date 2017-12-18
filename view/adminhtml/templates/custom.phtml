@@ -1,19 +1,15 @@
 <?php /** @var \Nord\Shipfunk\Block\Adminhtml\Order\View\Custom $block */ ?>
-
 <?php if ($block->hasPickupInformation()) { ?>
-    <div class="admin__page-section-item" id="shippingPickupInformation" style="margin-top:200px; width:calc( (100%) * .5 - 30px );">
-        <div class="admin__page-section-item-title">
-        <span class="title">
-            Pickup Point
-        </span>
-        </div>
-        <address class="admin__page-section-item-content">
-            <?php echo $block->getPickupInformation(); ?>
-        </address>
+<div id="shippingPickupInformation">
+    <div class="admin__page-section-item">
+        <?= $block->escapeHtml($block->getPickupInformation(), ['br']) ?>
     </div>
-    <script>
-        require(['jquery'], function ($) {
-            $('#shippingPickupInformation').appendTo($('.order-shipping-address').parent());
-        });
-    </script>
+</div>
+<script>
+    require(['jquery'], function ($) {
+      $(document).ready(function() {
+        $('#shippingPickupInformation').appendTo($('.order-shipping-method'));
+      });
+    });
+</script>
 <?php } ?>

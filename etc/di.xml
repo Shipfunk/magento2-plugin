@@ -10,22 +10,25 @@
     <type name="Magento\Quote\Model\Cart\ShippingMethodConverter">
         <plugin name="shipfunk_converter" type="Nord\Shipfunk\Plugin\ShippingMethodConverterPlugin"/>
     </type>
-    <type name="Magento\Sales\Block\Adminhtml\Order\View">
-        <plugin name="BoxPackerButton" type="Nord\Shipfunk\Plugin\Block\Adminhtml\Order\View"/>
-    </type>
     <type name="Magento\Shipping\Block\Adminhtml\Order\Packaging\Grid">
         <plugin name="shipfunk_grid" type="Nord\Shipfunk\Plugin\GridPlugin"/>
     </type>
-    <type name="Magento\Sales\Model\Order\Email\Sender\OrderSender">
-        <plugin name="shipfunk_sender" type="Nord\Shipfunk\Plugin\OrderSenderPlugin"/>
+    
+    <preference for="Nord\Shipfunk\Api\GuestGetPickupPointsManagementInterface" type="Nord\Shipfunk\Model\Api\GuestGetPickupPointsManagement" />
+    <preference for="Nord\Shipfunk\Api\GetPickupPointsManagementInterface" type="Nord\Shipfunk\Model\Api\GetPickupPointsManagement" />
+    <preference for="Nord\Shipfunk\Api\GuestSelectedDeliveryManagementInterface" type="Nord\Shipfunk\Model\Api\GuestSelectedDeliveryManagement" />
+    <preference for="Nord\Shipfunk\Api\SelectedDeliveryManagementInterface" type="Nord\Shipfunk\Model\Api\SelectedDeliveryManagement" />
+    <preference for="Nord\Shipfunk\Api\Data\ShipfunkResponseInterface" type="Nord\Shipfunk\Model\Api\ShipfunkResponse" /> 
+  
+    <preference for="Nord\Shipfunk\Api\Data\QuoteSelectedPickupInterface" type="Nord\Shipfunk\Model\Quote\SelectedPickup" />
+    <preference for="Nord\Shipfunk\Api\Data\OrderSelectedPickupInterface" type="Nord\Shipfunk\Model\Order\SelectedPickup" />
+    <type name="Magento\Checkout\Api\ShippingInformationManagementInterface">
+        <plugin name="save_selected_pickup_to_quote" type="Nord\Shipfunk\Plugin\ShippingInformationManagementPlugin"/>
     </type>
-
-    <preference for="Magento\Quote\Model\Quote\Address" type="Nord\Shipfunk\Model\Quote\Address"/>
-    <preference for="Magento\Quote\Model\ShippingMethodManagement" type="Nord\Shipfunk\Model\ShippingMethodManagement"/>
-
-    <preference for="Magento\Sales\Model\Order\Email\Sender\OrderSender"
-                type="Nord\Shipfunk\Model\ShipfunkOrderSender"/>
-
-
-    <preference for="Magento\Shipping\Model\Rate\Result" type="Nord\Shipfunk\Model\Rate\Result" />
+    <type name="Magento\Quote\Api\CartRepositoryInterface">
+        <plugin name="get_selected_pickup_to_quote" type="Nord\Shipfunk\Plugin\LoadQuoteAfter"/>
+    </type>
+    <type name="Magento\Sales\Api\OrderRepositoryInterface">
+        <plugin name="get_selected_pickup_to_order" type="Nord\Shipfunk\Plugin\LoadOrderAfter"/>
+    </type>
 </config>

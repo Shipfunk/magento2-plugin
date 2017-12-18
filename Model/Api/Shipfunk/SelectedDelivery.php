@@ -2,72 +2,66 @@
 
 namespace Nord\Shipfunk\Model\Api\Shipfunk;
 
-use Magento\Framework\View\Element\Template\Context;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\CustomerHelper;
+use Magento\Checkout\Model\Session as CheckoutSession;
+use Psr\Log\LoggerInterface;
 use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
+use Magento\Framework\HTTP\ZendClientFactory;
 
 /**
  * Class SelectedDelivery
  *
  * @package Nord\Shipfunk\Model\Api\Shipfunk
  */
-class SelectedDelivery extends AbstractApiHelper
+class SelectedDelivery extends AbstractEndpoint
 {
     /**
-     * SelectedDelivery constructor.
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+
+    /**
      *
-     * @param Context            $context
+     * @param LoggerInterface    $logger
      * @param ShipfunkDataHelper $shipfunkDataHelper
-     * @param CustomerHelper     $customerHelper
+     * @param ZendClientFactory  $httpClientFactory
+     * @param CheckoutSession    $checkoutSession
      */
     public function __construct(
-        Context $context,
+        LoggerInterface $logger,
         ShipfunkDataHelper $shipfunkDataHelper,
-        CustomerHelper $customerHelper
+        ZendClientFactory $httpClientFactory,
+        CheckoutSession $checkoutSession
     ) {
-        parent::__construct($context, $shipfunkDataHelper, $customerHelper);
+        parent::__construct($logger, $shipfunkDataHelper, $httpClientFactory);
+        $this->checkoutSession = $checkoutSession;
     }
-
-    /**
-     * @return \Requests_Response|string
-     */
-    public function getResult()
+  
+    public function execute($query = [])
     {
-
-        $result = $this->execute();
-
-        return $result;
-    }
-
-    /**
-     * @return \Requests_Response|string
-     */
-    protected function execute()
-    {
-        $this->setSimpleXml();
-
-        $selectedOption = [
-            'carriercode'     => $this->getCarrierCode(),
-            'productcode'     => $this->getProductCode(),
-            'orderid'         => $this->getQuoteId(),
-            'webshopid'       => $this->getWebshopId(),
-            'realprice'       => $this->getRealPrice(),
-            'discountedprice' => $this->getDiscountedPrice(),
-        ];
-
-        if ($this->getPickupId()) {
-            $selectedOption['pickupid'] = $this->getPickupId();
+        if (!$query) {
+          $query = [
+             'query' => [
+                'order' => [
+                  'selected_option' => [
+                    'carriercode' => $this->getCarrierCode(),
+                    'pickupid' => $this->getPickupId(),
+                    'calculated_price' => $this->getCalculatedPrice(),
+                    'customer_price' => $this->getCustomerPrice(),
+                    'return_prices' => $this->getReturnPrice()
+                  ]
+                ]
+             ]
+          ];
         }
-
-        $this->appendToXml([
-            'selected_option' => $selectedOption,
-        ], $this->simpleXml);
-
-        $xml = $this->simpleXml->asXML();
-
-        $result = $this->setRoute('selected_delivery')->setFieldname('selected')->get($xml);
-
+      
+        $query = utf8_encode(json_encode($query));
+        $quoteId = $this->checkoutSession->getQuote()->getId();
+        $this->setEndpoint('selected_delivery');
+        if (!$this->getOrderId() && $quoteId) {
+          $this->setOrderId($quoteId);
+        }
+        $result = $this->get($query);
+      
         return $result;
     }
 }

@@ -2,166 +2,80 @@
 
 namespace Nord\Shipfunk\Model\Api\Shipfunk;
 
-use Magento\Framework\DataObject;
-use Magento\Quote\Model\QuoteFactory;
-use Magento\Quote\Model\ShippingFactory;
-use Magento\Sales\Model\OrderFactory;
-use Magento\Shipping\Model\Shipment\Request;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\CustomerHelper;
-use Nord\Shipfunk\Helper\Data as ShipfunkDataHelper;
-use Magento\Framework\View\Element\Template\Context;
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\ParcelHelper;
+use Magento\Sales\Api\OrderItemRepositoryInterface;
 
 /**
  * Class CreateNewPackageCards
  *
  * @package Nord\Shipfunk\Model\Api\Shipfunk
  */
-class CreateNewPackageCards extends AbstractApiHelper
+class CreateNewPackageCards extends AbstractEndpoint
 {
     /**
-     * @var ParcelHelper
+     * @var OrderItemRepositoryInterface
      */
-    protected $parcelHelper;
-
+    protected $orderItemRepository;
+  
     /**
-     * @var QuoteFactory
-     */
-    protected $quoteFactory;
-
-    /**
-     * @var OrderFactory
-     */
-    protected $orderFactory;
-
-    /**
-     * @var ShippingFactory
-     */
-    protected $shippingFactory;
-
-    /**
-     * CreateNewPackageCards constructor.
      *
-     * @param Context $context
-     * @param ShipfunkDataHelper $shipfunkDataHelper
-     * @param CustomerHelper $customerHelper
-     * @param ParcelHelper $parcelHelper
-     * @param QuoteFactory $quoteFactory
-     * @param OrderFactory $orderFactory
-     * @param ShippingFactory $shippingFactory
+     * @param \Psr\Log\LoggerInterface    $logger
+     * @param \Nord\Shipfunk\Helper\Data $shipfunkDataHelper
+     * @param \Magento\Framework\HTTP\ZendClientFactory  $httpClientFactory
+     * @param OrderItemRepositoryInterface $orderItemRepository
      */
     public function __construct(
-        Context $context,
-        ShipfunkDataHelper $shipfunkDataHelper,
-        CustomerHelper $customerHelper,
-        ParcelHelper $parcelHelper,
-        QuoteFactory $quoteFactory,
-        OrderFactory $orderFactory,
-        ShippingFactory $shippingFactory
+        \Psr\Log\LoggerInterface $logger,
+        \Nord\Shipfunk\Helper\Data $shipfunkDataHelper,
+        \Magento\Framework\HTTP\ZendClientFactory $httpClientFactory,
+        OrderItemRepositoryInterface $orderItemRepository
     ) {
-        parent::__construct($context, $shipfunkDataHelper, $customerHelper);
-
-        $this->parcelHelper = $parcelHelper;
-        $this->quoteFactory = $quoteFactory;
-        $this->orderFactory = $orderFactory;
-        $this->shippingFactory = $shippingFactory;
-
+        parent::__construct($logger, $shipfunkDataHelper, $httpClientFactory);
+        $this->orderItemRepository = $orderItemRepository;
     }
-
-    /**
-     * @return string
-     */
-    public function getRestFormat()
+  
+    public function execute($query = [])
     {
-        return "/both/xml";
-    }
-
-    /**
-     * @return DataObject
-     */
-    public function getResult()
-    {
-        /** @var Request $request */
-        $request = $this->getRequest();
-
-        $this->setOrder($request->getOrderShipment()->getOrder());
-
-        $shippingDescription = $this->getOrder()->getData('shipping_description');
-        $shipping = explode(" - ", $shippingDescription);
-        $shippingCompany = $shipping[0];
-
-        $parcelParams = $request->getPackageParams();
-        $parcelId = $request->getPackageId();
-
-        $this->setSimpleXml();
-        $this->appendToXml($this->getWebshop(), $this->simpleXml);
-        $this->appendToXml(
-            [
+        if (!$query) {
+          $request = $this->getRequest(); 
+          // decide here, based on available data, are we sending parcels or product codes
+          $packages = $this->getPackages();
+          
+          $parcels = [];
+          foreach ($packages as $pkgId => $pkg) {
+              $skus = [];
+              foreach ($pkg['items'] as $itemId => $itemData) {
+                  $orderItem = $this->orderItemRepository->get($itemId);
+                  $skus[] = $orderItem->getSku();
+              }
+              $parcels[] = [
+                  'warehouse' => $this->helper->getConfigData('warehouse'),
+                  'product_codes' => $skus  // @todo How is split qty per package affecting Shipfunk ? 
+              ];
+          }
+          $query = [
+             'query' => [
                 'order' => [
-                    'orderid'   => $this->getOrder()->getRealOrderId(),
-                    'returnNow' => 1,
+                    'return_cards' => 1, // @todo should this be configurable ?
+                    'parcels' => $parcels
                 ],
-            ],
-            $this->simpleXml
-        );
-
-        $parcel = [
-            'warehouse'  => $this->helper->getConfigData('warehouse'),
-            'parcelCode' => $parcelId,
-            'weight'     => $parcelParams->getWeight(),
-            'dimens'     => $parcelParams->getLength()."x".$parcelParams->getWidth()."x".$parcelParams->getHeight(),
-        ];
-
-        $this->appendToXml(
-            [
-                'parcel' => $parcel,
-            ],
-            $this->simpleXml,
-            'order'
-        );
-
-        $xml = $this->simpleXml->asXML();
-
-        $result = $this
-            ->setRoute('create_new_package_cards')
-            ->setFieldname('createnewpgcard')
-            ->post($xml);
-
-        $resultXml = simplexml_load_string($result->body);
-        $response = new DataObject();
-
-        if (!isset($resultXml->parcel)) {
-            // if we get an error here, it usually means that selecteddelivery has not been set or in most cases, we have a duplicate temp order id
-            $response->setError(true);
-            /*
-            $this->logger->log(
-                LogLevel::INFO,
-                "Shipfunk Error (CreateNewPackageCards) : ".$resultXml->Error->Message->__toString()
-            );
-            */
-            $errorMessage = __("shipfunk_error_7");
-
-            $response->setErrors($errorMessage);
-            $response->setMessage($errorMessage);
-        } else {
-            $parcelInformation = $resultXml->parcel;
-            $sendTrCode = $parcelInformation->send_trcode->__toString();
-            $sendCard = base64_decode($parcelInformation->send_card->__toString());
-
-            $request->setPackageId($parcelId);
-            $request->setPackagingType($parcelParams->getContainer());
-            $request->setPackageWeight($parcelParams->getWeight());
-            $request->setPackageParams(new DataObject($parcelParams->getData()));
-
-            $response->setTrackingNumber($sendTrCode."/".$shippingCompany);
-            $response->setShippingLabelContent($sendCard);
+                'customer' => [
+                    'first_name' => $request->getRecipientContactPersonFirstName(),
+                    'last_name' => $request->getRecipientContactPersonLastName(),
+                    'street_address' => $request->getRecipientAddressStreet(),
+                    'postal_code' => $request->getRecipientAddressPostalCode(),
+                    'city' => $request->getRecipientAddressCity(),
+                    'country' => $request->getRecipientAddressCountryCode(),
+                    'phone' => $request->getRecipientContactPhoneNumber(),
+                    'email' => $request->getRecipientEmail()
+                ]
+             ]
+          ];
         }
-
-        $response->setGatewayResponse($resultXml);
-
-        return $response;
+      
+      
+        $query = utf8_encode(json_encode($query));
+        $result = $this->setEndpoint('create_new_package_cards')->post($query);
+      
+        return $result;
     }
-
-
 }

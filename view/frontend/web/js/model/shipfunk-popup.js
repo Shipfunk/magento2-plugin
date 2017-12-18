@@ -11,18 +11,24 @@ define(
         'Magento_Ui/js/modal/modal',
         'Magento_Checkout/js/checkout-data',
         'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/model/resource-url-manager',
         'Magento_Customer/js/model/address-list',
         'Magento_Ui/js/modal/alert',
-        'mage/translate'
+        'mage/translate',
+        'mage/storage',
+        'Magento_Checkout/js/model/full-screen-loader'
     ],
-    function ($, ko, modal, checkoutData, quote, addressList, alert, $t) {
+    function ($, ko, modal, checkoutData, quote, resourceUrlManager, addressList, alert, $t, storage, fullScreenLoader) {
         'use strict';
         var carrierData = ko.observable();
         var carriercode = ko.observable();
-        var productcode = ko.observable();
         var product_description = ko.observable();
         var price = ko.observable();
         var selectedPickup = ko.observable(false);
+        var selectedPickupId = ko.computed(function() {
+            var sel = selectedPickup();
+            return sel.pickup_id;
+        });
         var shippingPoints = ko.observableArray([]);
 
         return {
@@ -64,180 +70,86 @@ define(
 
                 carriercode(methodCodeArray[1]);
                 carriercode.valueHasMutated();
-                productcode(methodCodeArray[2]);
-                productcode.valueHasMutated();
                 price(method.amount);
                 price.valueHasMutated();
 
                 product_description(method.extension_attributes.method_description);
                 product_description.valueHasMutated();
 
-                var sf_returntype = "json";
-                var sf_thisorderid = window.checkoutConfig.quoteItemData[0].quote_id;
-                var sf_webshopid = window.shipfunkPopup.webshopid;
-                var sf_language_code = "EN";
-                var sf_country = address.countryId ? address.countryId : address.country_id;
-                $.ajax({
-                    type: "GET",
-                    url: window.shipfunkPopup.apiUrl + "getpickups/" + methodCodeArray[1] + "/" + address.postcode + "/" + sf_returntype + "/" + sf_webshopid + "/" + sf_thisorderid + "/" + sf_country + "/" + sf_language_code,
-                    timeout: 5000, // 5 second timeout in millis!
-                    dataType: "jsonp",
-                    success: function (data, textStatus, jqXHR) {
-
-                        var resp = $.parseJSON(data);
-                        var response = resp.response;
-
-                        self.storePickupPoints(response);
-
+                var sf_data = {
+                    "order": {
+                      "carriercode": methodCodeArray[1],
+                      "return_count": 15
+                    },
+                    "customer": {
+                      "postal_code": address.postcode,
+                      "country": address.countryId ? address.countryId : address.country_id
+                    }
+                };
+                fullScreenLoader.startLoader();
+                storage.post(
+                    resourceUrlManager.getUrlForGetPickupPoints(quote),
+                    JSON.stringify({query: JSON.stringify(sf_data)})
+                ).done(
+                    function (response) {
+                        var responseJson = JSON.parse(response.response);
+                        response = responseJson.response;
+                      
                         if (response !== undefined && response.length) {
                             self.showModal();
-                            // display only 1st 5 points
-                            response = response.slice(0, 15);
                             shippingPoints(response);
                         }
                         else {
                             shippingPoints(null);
-                            self.hideModal();
+                            selectedPickup(false);
                         }
                         shippingPoints.valueHasMutated();
-                        $('#shipfunkPickup').html('');
-
+                        fullScreenLoader.stopLoader();
                     }
-                });
-
-                console.debug('done');
+                ).fail(
+                    function (response) {
+                        fullScreenLoader.stopLoader();
+                    }
+                );
             },
-
-            selectPickupPoint: function (point) {
+          
+            selectDelivery: function (point = false) {
                 var self = this;
                 var selectedData = {
-                    query: {
-                        selected_option: {
-                            carriercode: carriercode(),
-                            productcode: productcode(),
-                            pickupid: point.pickup_id,
-                            orderid: window.checkoutConfig.quoteItemData[0].quote_id,
-                            webshopid: window.shipfunkPopup.webshopid,
-                            realprice: price(),
-                            discountedprice: price(),
-                            return_prices: "1"
-                        }
+                    "order": {
+                      "selected_option": {
+                        "carriercode": carriercode(),
+                        "pickupid": point ? point.pickup_id : "",
+                        "calculated_price": price(),
+                        "customer_price": price(),
+                        "return_prices": "1"
+                      }
                     }
                 };
-                $.ajax({
-                    type: "GET",
-                    url: window.shipfunkPopup.apiUrl + "selected_delivery/json/json",
-                    timeout: 5000, // 5 second timeout in millis!
-                    data: {'sf_selected': JSON.stringify(selectedData)},
-                    dataType: "jsonp",
-                    success: function (data, textStatus, jqXHR) {
-                        selectedPickup(point.pickup_id);
-                        self.selectPickupPointLocation(point);
-                        //self.hideModal();
-                    },
-                    error: function (jqXHR, textStatus) {
-                        alert({
-                            content: $t("Something went wrong")
-                        });
-                    }
-                });
-                $.ajax({
-                    type: "POST",
-                    url: window.shipfunkPopup.baseUrl + "shipfunk/index/index",
-                    timeout: 5000, // 5 second timeout in millis!
-                    data: {'data': selectedData},
-                    dataType: "json",
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus) {
-                        alert({
-                            content: $t("Something went wrong while storing the pickup points")
-                        });
-                    }
-                });
-            },
-
-            storePickupPoints: function (pickups) {
-                var data = ['insert', carriercode(), productcode(), pickups];
-                $.ajax({
-                    type: "POST",
-                    url: window.shipfunkPopup.baseUrl + "shipfunk/index/index",
-                    timeout: 5000, // 5 second timeout in millis!
-                    data: {'data': data},
-                    dataType: "json",
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus) {
-                        alert({
-                            content: $t("Something went wrong while storing the pickup points")
-                        });
-                    }
-                });
-            },
-            removeShipping: function () {
-                console.debug('remove');
-                var data = ['delete', window.checkoutConfig.quoteItemData[0].quote_id];
-                $.ajax({
-                    type: "POST",
-                    url: window.shipfunkPopup.baseUrl + "shipfunk/index/index",
-                    timeout: 5000, // 5 second timeout in millis!
-                    data: {'data': data},
-                    dataType: "json",
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus) {
-                        alert({
-                            content: $t("Something went wrong while storing the pickup points")
-                        });
-                    }
-                });
-
-            },
-            selectPickupPointLocation: function (pickup) {
-
-                var self = this;
-                var data = '<b>Selected Pickup Location</b>' +
-                    '<br />' + pickup.pickup_name + '' +
-                    '<br />' + pickup.pickup_addr + '' +
-                    '<br />' + pickup.pickup_postal + ' ' + pickup.pickup_city;
-                $('#shipfunkPickup').html(data).prependTo('#opc-shipping_method');
-
-                self.hideModal();
-            },
-
-            selectDelivery: function () {
-                var selectedData = {
-                    query: {
-                        selected_option: {
-                            carriercode: carriercode(),
-                            productcode: productcode(),
-                            pickupid: '',
-                            orderid: window.checkoutConfig.quoteItemData[0].quote_id,
-                            webshopid: window.shipfunkPopup.webshopid,
-                            realprice: price(),
-                            discountedprice: price(),
-                            return_prices: "1"
+                fullScreenLoader.startLoader();
+                storage.post(
+                    resourceUrlManager.getUrlForSelectedDelivery(quote),
+                    JSON.stringify({query: JSON.stringify(selectedData)})
+                ).done(
+                    function (response) {
+                        var responseJson = JSON.parse(response.response);
+                        response = responseJson.response;
+                        if (point) {
+                            selectedPickup(point);
+                            self.hideModal();
                         }
+                        fullScreenLoader.stopLoader();
                     }
-                };
-
-                $.ajax({
-                    type: "GET",
-                    url: window.shipfunkPopup.apiUrl + "selected_delivery/json/json",
-                    timeout: 5000, // 5 second timeout in millis!
-                    data: {'sf_selected': JSON.stringify(selectedData)},
-                    dataType: "jsonp",
-                    success: function (data, textStatus, jqXHR) {
-                        //console.debug("selected: "+data);
-                    },
-                    error: function (jqXHR, textStatus) {
+                ).fail(
+                    function (response) {
                         alert({
                             content: $t("Something went wrong test")
                         });
+                        fullScreenLoader.stopLoader();
                     }
-                });
+                );
             },
-
+           
             getShippingPoints: function () {
                 return shippingPoints;
             },
@@ -250,12 +162,12 @@ define(
                 return carriercode;
             },
 
-            getProductCode: function () {
-                return productcode;
-            },
-
             getSelectedPickup: function () {
                 return selectedPickup;
+            },
+          
+            getSelectedPickupId: function () {
+                return selectedPickupId;
             },
 
             getProductDescription: function () {

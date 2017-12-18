@@ -22,7 +22,7 @@
                     <div data-bind="attr: {
                                              'id': 's_method_' + pickup_id,
                                           },
-                                          css: $parent.selectedPickup() == pickup_id ? 'selected' : '',
+                                          css: $parent.selectedPickupId() == pickup_id ? 'selected' : '',
                                           click: $parent.selectPickupPoint,
                                           text: pickup_name + ': ' + pickup_addr + ', ' + pickup_postal + ', ' + pickup_city + ', ' + pickup_country">
                     </div>

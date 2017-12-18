@@ -2,17 +2,10 @@
 
 namespace Nord\Shipfunk\Plugin;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Quote\Api\Data\ShippingMethodExtensionFactory;
 use Magento\Quote\Model\Cart\ShippingMethodConverter;
-use Magento\Store\Model\ScopeInterface;
-use Magento\Store\Model\StoreManagerInterface;
+use Nord\Shipfunk\Helper\Data;
 
-/**
- * Class ShippingMethodConverterPlugin
- *
- * @package Nord\Shipfunk\Plugin
- */
 class ShippingMethodConverterPlugin
 {
     /**
@@ -21,92 +14,54 @@ class ShippingMethodConverterPlugin
     protected $shippingMethodExtension;
 
     /**
-     * @var ScopeConfigInterface
+     * @var Data
      */
-    protected $scopeConfig;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
+    protected $_heler;
 
     /**
      * ShippingMethodConverterPlugin constructor.
      *
      * @param ShippingMethodExtensionFactory $shippingMethodExtension
-     * @param ScopeConfigInterface           $scopeConfig
-     * @param StoreManagerInterface          $storeManager
+     * @param Data           $helper
      */
     public function __construct(
         ShippingMethodExtensionFactory $shippingMethodExtension,
-        ScopeConfigInterface $scopeConfig,
-        StoreManagerInterface $storeManager
+        Data $helper
     ) {
         $this->shippingMethodExtension = $shippingMethodExtension;
-        $this->scopeConfig = $scopeConfig;
-        $this->storeManager = $storeManager;
+        $this->_helper = $helper;
     }
 
     /**
      * @param ShippingMethodConverter $subject
-     * @param                         $proceed
-     * @param                         $rateModel
-     * @param                         $quoteCurrencyCode
+     * @param \Magento\Quote\Api\Data\ShippingMethodInterface $proceed
+     * @param \Magento\Quote\Model\Quote\Address\Rate $rateModel
      *
-     * @return mixed
+     * @return \Magento\Quote\Api\Data\ShippingMethodInterface
      */
-    public function aroundModelToDataObject(ShippingMethodConverter $subject, $proceed, $rateModel, $quoteCurrencyCode)
+    public function afterModelToDataObject(ShippingMethodConverter $subject, $result, $rateModel)
     {
-        $return = $proceed($rateModel, $quoteCurrencyCode);
+        $errorMessage = $rateModel->getErrorMessage();
         $extensionModel = $this->shippingMethodExtension->create();
-        $defaultCategory = "DEFAULT".$this->getConfigValue('category_default');
-        $useCategorySorting = $this->getConfigValue('category_sorting');
+        $defaultCategory = "DEFAULT".$this->_helper->getConfigData('category_default');
+        $useCategorySorting = $this->_helper->getConfigData('category_sorting');
 
-        if ($rateModel->getCarrier() === 'shipfunk') {
-
+        if ($rateModel->getCarrier() === 'shipfunk' && empty($errorMessage)) {
             $x = explode("||", $rateModel->getMethodDescription());
-
-            /** @noinspection PhpUndefinedMethodInspection */
             $extensionModel->setMethodDescription($x[0]);
-
             $category = empty($x[1]) ? $defaultCategory : $x[1];
-
             if (empty($useCategorySorting)) {
                 $category = 'ZZZZZZ';
             }
-
-            /** @noinspection PhpUndefinedMethodInspection */
             $extensionModel->setCategory($category);
-            /** @noinspection PhpUndefinedMethodInspection */
             $extensionModel->setDelivtime($x[2]);
-
-            /** @noinspection PhpUndefinedMethodInspection */
         } else {
-
             if (empty($useCategorySorting)) {
                 $defaultCategory = 'ZZZZZZ';
             }
-            /** @noinspection PhpUndefinedMethodInspection */
             $extensionModel->setCategory($defaultCategory);
         }
 
-        return $return->setExtensionAttributes($extensionModel);
-    }
-
-    /**
-     * @param $field
-     *
-     * @return mixed
-     */
-    protected function getConfigValue($field)
-    {
-        $path = 'carriers/shipfunk/'.$field;
-        $store = $this->storeManager->getStore();
-
-        return $this->scopeConfig->getValue(
-            $path,
-            ScopeInterface::SCOPE_STORE,
-            $store
-        );
+        return $result->setExtensionAttributes($extensionModel);
     }
 }

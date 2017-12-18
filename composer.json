@@ -3,11 +3,10 @@
     "description": "Shipfunk shipping method for Magento 2",
     "require": {
         "php": "~5.6.0|7.0.2|~7.0.6",
-        "magento/module-sales": "101.*",
-        "rmccue/requests": "^1.7"
+        "magento/module-sales": "~100.0|~101.0"
     },
     "type": "magento2-module",
-    "version": "1.0.2",
+    "version": "2.0.0.0",
     "license": [
         "OSL-3.0",
         "AFL-3.0"

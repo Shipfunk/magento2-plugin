@@ -56,8 +56,6 @@ class DeliveryOptionPopup extends Template
     public function getConfig()
     {
         return [
-            'webshopid'  => $this->helper->getConfigData('shipfunk_username'),
-            'apiUrl'     => $this->helper->getConfigData('shipfunk_url'),
             'baseUrl'    => $this->getBaseUrl(),
         ];
     }

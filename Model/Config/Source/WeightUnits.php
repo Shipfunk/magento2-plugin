@@ -17,8 +17,11 @@ class WeightUnits implements ArrayInterface
     public function toOptionArray()
     {
         return [
-            ['value' => 'kg', 'label' => 'kg'],
-            ['value' => 'lb', 'label' => 'lb'],
+            ['value' => 'g', 'label' => __('grams')],
+            ['value' => 'kg', 'label' => __('kilograms')],
+            ['value' => 'oz', 'label' => __('ounces')],
+            ['value' => 'lb', 'label' => __('pounds')],
+            ['value' => 'st', 'label' => __('stones')]
         ];
     }
 

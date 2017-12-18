@@ -2,108 +2,32 @@
 
 namespace Nord\Shipfunk\Model\Api\Shipfunk;
 
-use Nord\Shipfunk\Model\Api\Shipfunk\Helper\AbstractApiHelper;
-
 /**
  * Class DeleteParcels
  *
  * @package Nord\Shipfunk\Model\Api\Shipfunk
  */
-class DeleteParcels extends AbstractApiHelper
+class DeleteParcels extends AbstractEndpoint
 {
-    /**
-     * @var string
-     */
-    protected $parcelCode;
-
-    /**
-     * @var string
-     */
-    protected $trackingCode;
-
-    /**
-     * @return mixed
-     */
-    public function getParcelCode()
+    public function execute($query = [])
     {
-        return $this->parcelCode;
-    }
-
-    /**
-     * @param string $parcelCode
-     *
-     * @return DeleteParcels
-     */
-    public function setParcelCode($parcelCode)
-    {
-        $this->parcelCode = $parcelCode;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTrackingCode()
-    {
-        return $this->trackingCode;
-    }
-
-    /**
-     * @param string $trackingCode
-     *
-     * @return DeleteParcels
-     */
-    public function setTrackingCode($trackingCode)
-    {
-        $this->trackingCode = $trackingCode;
-
-        return $this;
-    }
-
-    /**
-     * @return void
-     */
-    public function removeAllParcels()
-    {
-        $this->setSimpleXml();
-
-        $this->appendToXml($this->getWebshop(), $this->simpleXml);
-        $this->appendToXml([
-            'order' => [
-                'orderid'        => $this->getOrderId(),
-                'rm_all_parcels' => 1,
-            ],
-        ], $this->simpleXml);
-
-        $xml = $this->simpleXml->asXML();
-
-        $this->setRouteAndFieldname('delete_parcel')->post($xml);
-    }
-
-    /**
-     * @return void
-     */
-    public function removeParcel()
-    {
-        $this->setSimpleXml();
-
-        $this->appendToXml($this->getWebshop(), $this->simpleXml);
-        $this->appendToXml([
-            'order' => [
-                'orderid' => $this->getOrderId(),
-            ],
-        ], $this->simpleXml);
-
-        $this->appendToXml([
-            'parcel' => [
-                'parcelCode'   => $this->getParcelCode(),
-                'trackingCode' => $this->getTrackingCode(),
-            ],
-        ], $this->simpleXml);
-
-        $xml = $this->simpleXml->asXML();
-
-        $this->setRouteAndFieldname('delete_parcel')->post($xml);
+        if (!$query) {
+          $query = [
+             'query' => [
+                'order' => [
+                    'remove_all_parcels' => (int) $this->getRemoveAll(),
+                    'return_parcels' => 1,
+                    'parcels' => [
+                      ['tracking_code' => $this->getTrackingCode()]
+                    ]
+                ]
+             ]
+          ];
+        }
+    
+        $query = utf8_encode(json_encode($query));
+        $result = $this->setEndpoint('delete_parcels')->post($query);
+      
+        return $result;
     }
 }

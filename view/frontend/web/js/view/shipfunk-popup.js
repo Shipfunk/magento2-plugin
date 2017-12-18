@@ -25,7 +25,7 @@ define(
             modalWindow: null,
             isLoading: ko.observable(false),
             description: shipfunkPopup.getProductDescription(),
-            selectedPickup: shipfunkPopup.getSelectedPickup(),
+            selectedPickupId: shipfunkPopup.getSelectedPickupId(),
             shippingPoints: shipfunkPopup.getShippingPoints(),
 
             defaults: {
@@ -59,10 +59,9 @@ define(
             },
 
             selectPickupPoint: function (pickupPoint) {
-                shipfunkPopup.selectPickupPoint(pickupPoint);
+                shipfunkPopup.selectDelivery(pickupPoint);
                 return true;
             }
-
         });
     }
 );

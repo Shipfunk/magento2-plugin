@@ -57,11 +57,11 @@ class ProductAttributesSetup extends EavSetup
         $entities = [
             \Magento\Catalog\Model\Product::ENTITY => [
                 'attributes' => [
-                    'shipfunk_length' => [
+                    'shipfunk_height' => [
                         'remove' => true,
                         'add' => [
                             'type' => 'decimal',
-                            'label' => 'Length',
+                            'label' => 'Height',
                             'input' => 'text',
                             'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_WEBSITE,
                             'required'  => false,

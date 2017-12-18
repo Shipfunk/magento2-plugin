@@ -1,51 +1,40 @@
 <!--
 /**
- * Copyright © 2016 Magento. All rights reserved.
+ * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
 -->
 <li id="shipping" class="checkout-shipping-address" data-bind="fadeVisible: visible()">
-    <div class="step-title" data-bind="i18n: 'Shipping Address'" data-role="title"></div>
+    <div class="step-title" translate="'Shipping Address'" data-role="title" />
     <div id="checkout-step-shipping"
          class="step-content"
          data-role="content">
 
-        <!-- ko if: (!quoteIsVirtual) -->
-        <!-- ko foreach: getRegion('customer-email') -->
-        <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
-        <!--/ko-->
-
-        <!-- ko foreach: getRegion('address-list') -->
-        <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
-
-        <!-- ko foreach: getRegion('address-list-additional-addresses') -->
-        <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
+        <each if="!quoteIsVirtual" args="getRegion('customer-email')" render="" />
+        <each args="getRegion('address-list')" render="" />
+        <each args="getRegion('address-list-additional-addresses')" render="" />
 
         <!-- Address form pop up -->
-        <!-- ko if: (!isFormInline) -->
-        <button type="button"
-                data-bind="click: showFormPopUp, visible: !isNewAddressAdded()"
-                class="action action-show-popup">
-            <span data-bind="i18n: 'New Address'"></span></button>
-        <div id="opc-new-shipping-address" data-bind="visible: isFormPopUpVisible()">
-            <!-- ko template: 'Magento_Checkout/shipping-address/form' --><!-- /ko -->
-        </div>
-        <!-- /ko -->
+        <if args="!isFormInline">
+            <button type="button"
+                    class="action action-show-popup"
+                    click="showFormPopUp"
+                    visible="!isNewAddressAdded()">
+                <span translate="'New Address'" />
+            </button>
+            <div id="opc-new-shipping-address"
+                 visible="isFormPopUpVisible()"
+                 render="shippingFormTemplate" />
+        </if>
 
-        <!-- ko foreach: getRegion('before-form') -->
-        <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
+        <each args="getRegion('before-form')" render="" />
 
         <!-- Inline address form -->
-        <!-- ko if: (isFormInline) -->
-        <!-- ko template: 'Magento_Checkout/shipping-address/form' --><!-- /ko -->
-        <!-- /ko -->
+        <render if="isFormInline" args="shippingFormTemplate" />
     </div>
 </li>
 
+<each if="visible()" args="getRegion('pickup-info')" render="" />
 
 <!--Shipping method template-->
 <li id="opc-shipping_method"
@@ -53,143 +42,44 @@
     data-bind="fadeVisible: visible(), blockLoader: isLoading"
     role="presentation">
     <div class="checkout-shipping-method">
-        <div class="step-title" data-bind="i18n: 'Shipping Methods'" data-role="title"></div>
-        <!-- ko foreach: getRegion('before-shipping-method-form') -->
-        <!-- ko template: getTemplate() --><!-- /ko -->
-        <!-- /ko -->
+        <div class="step-title"
+             translate="'Shipping Methods'"
+             data-role="title" />
+
+        <each args="getRegion('before-shipping-method-form')" render="" />
+
         <div id="checkout-step-shipping_method"
              class="step-content"
              data-role="content"
              role="tabpanel"
              aria-hidden="false">
-            <!-- ko if: rates().length  -->
-            <form class="form methods-shipping" id="co-shipping-method-form" data-bind="submit: setShippingInformation"
+            <form id="co-shipping-method-form"
+                  class="form methods-shipping"
+                  if="rates().length"
+                  submit="setShippingInformation"
                   novalidate="novalidate">
-                <div id="checkout-shipping-method-load">
-                    <table class="table-checkout-shipping-method" style="width:100% !important;">
-                        <tbody>
 
-                        <!--ko foreach: { data: categories(), as: 'cat'}-->
-                        <!--ko ifnot: ($parent.categories().length == 1) -->
-                        <tr class="row catHeader">
-                            <td colspan="6" data-bind="text:cat">
-
-                            </td>
-                        </tr>
-                        <!-- /ko -->
-                        <!--ko if: ($parent.categories().length == 1 && cat != 'ZZZZZZ') -->
-                        <tr class="row catHeader">
-                            <td colspan="6" data-bind="text:cat">
-
-                            </td>
-                        </tr>
-                        <!-- /ko -->
-                        <!--ko foreach: { data: $parent.rates(), as: 'method'}-->
-
-                        <!--ko if:(method.extension_attributes.category == cat || method.extension_attributes.category == 'DEFAULT'+cat) -->
-
-                        <tr class="row" data-bind="click: $parents[2].selectShippingMethod">
-                            <td class="col col-method">
-                                <!-- ko ifnot: method.error_message -->
-
-                                <!-- ko if: $parents[1].rates().length == 1 -->
-                                <input name="shipping_method"
-                                       class="radio"
-                                       type="radio"
-                                       data-bind="attr: {
-                                                                    checked: $parents[1].rates().length == 1,
-                                                                    'value' : method.carrier_code + '_' + method.method_code,
-                                                                    'id': 's_method_' + method.method_code,
-                                                                    'aria-labelledby': 'label_method_' + method.method_code + '_' + method.carrier_code + ' ' + 'label_carrier_' + method.method_code + '_' + method.carrier_code
-                                                                 }"/>
-                                <!-- /ko -->
-                                <!--ko ifnot: ($parents[1].rates().length == 1)-->
-                                <input name="shipping_method" type="radio"
-                                       data-bind="
-                                                                value: method.carrier_code + '_' + method.method_code,
-                                                                checked: $parents[1].isSelected,
-                                                                attr: {
-                                                                    'id': 's_method_' + method.carrier_code + '_' + method.method_code,
-                                                                    'aria-labelledby': 'label_method_' + method.method_code + '_' + method.carrier_code + ' ' + 'label_carrier_' + method.method_code + '_' + method.carrier_code
-                                                                },
-                                                                click: $parents[1].selectShippingMethod"
-                                       class="radio"/>
-                                <!--/ko-->
-
-
-                                <!-- /ko -->
-                            </td>
-                            <td class="col col-price">
-                                <!-- ko foreach: $parents[1].getRegion('price') -->
-                                <!-- ko template: getTemplate() --><!-- /ko -->
-                                <!-- /ko -->
-                            </td>
-
-                            <td class="col col-method"
-                                data-bind="text: method.method_title, attr: {'id': 'label_method_' + method.method_code + '_' + method.carrier_code}"></td>
-
-                            <td class="col col-carrier"
-                                data-bind="text: method.carrier_title, attr: {'id': 'label_carrier_' + method.method_code + '_' + method.carrier_code}"></td>
-                            <td data-bind="text:method.extension_attributes.delivtime"></td>
-                            <td>
-                                <!-- ko if: method.extension_attributes.method_description -->
-                                <div id="tooltip">
-                                    <a href="" onclick="return false;"><img
-                                            src="../pub/static/frontend/Magento/luma/en_US/Nord_Shipfunk/images/info.png">
-                                        <span data-bind="html:method.extension_attributes.method_description"></span>
-                                    </a>
-                                </div>
-                                <!-- /ko -->
-                            </td>
-                        </tr>
-
-                        <!-- ko if:  method.error_message -->
-                        <tr class="row row-error">
-                            <td class="col col-error" colspan="5">
-                                <div class="message error">
-                                    <div data-bind="text: method.error_message"></div>
-                                </div>
-                                <span class="no-display">
-                                                    <input name="shipping_method" type="radio"
-                                                           data-bind="attr: {'value' : method.method_code, 'id': 's_method_' + method.method_code}"/>
-                                                </span>
-                            </td>
-                        </tr>
-                        <!-- /ko -->
-
-                        <!-- /ko -->
-
-
-                        <!-- /ko -->
-
-                        <!-- /ko -->
-
-                        </tbody>
-                    </table>
-                </div>
+                <render args="shippingMethodListTemplate"/>
 
                 <div id="onepage-checkout-shipping-method-additional-load">
-                    <!-- ko foreach: getRegion('shippingAdditional') -->
-                    <!-- ko template: getTemplate() --><!-- /ko -->
-                    <!-- /ko -->
+                    <each args="getRegion('shippingAdditional')" render="" />
                 </div>
-                <!-- ko if: errorValidationMessage().length > 0 -->
-                <div class="message notice">
-                    <span><!-- ko text: errorValidationMessage()--><!-- /ko --></span>
+                <div role="alert"
+                     if="errorValidationMessage().length"
+                     class="message notice">
+                    <span text="errorValidationMessage()" />
                 </div>
-                <!-- /ko -->
                 <div class="actions-toolbar" id="shipping-method-buttons-container">
                     <div class="primary">
                         <button data-role="opc-continue" type="submit" class="button action continue primary">
-                            <span><!-- ko i18n: 'Next'--><!-- /ko --></span>
+                            <span translate="'Next'" />
                         </button>
                     </div>
                 </div>
             </form>
-            <!-- /ko -->
-            <!-- ko ifnot: rates().length > 0 -->
-            <div class="no-quotes-block"><!-- ko i18n: 'Sorry, no quotes are available for this order at this time'-->
-                <!-- /ko --></div><!-- /ko -->
+            <div class="no-quotes-block"
+                 ifnot="rates().length > 0"
+                 translate="'Sorry, no quotes are available for this order at this time'" />
         </div>
     </div>
 </li>
