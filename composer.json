@@ -3,8 +3,7 @@
     "description": "Shipfunk shipping method for Magento 2",
     "require": {
         "php": "~5.6.0|7.0.2|~7.0.6",
-        "magento/module-sales": "100.*",
-        "dvdoug/boxpacker": "2.0.2",
+        "magento/module-sales": "101.*",
         "rmccue/requests": "^1.7"
     },
     "type": "magento2-module",
