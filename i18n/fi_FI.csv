@@ -87,3 +87,5 @@ Warehouse,Varasto
 "Place Order","Vahvista Tilaus"
 "Products will be packed into the parcels by an automatic box packer which could make mistakes, if the product details are not suffiecient or the product dimensions are somehow difficult for the algorithm","Tuotteet pakataan kolleihin käyttäen automaattista BoxPackeria, mikä voi tehdä virheitä jos tuotetiedot eivät ole riittävät tai tuotteen mittasuhteet ovat erityisen haastavat algoritmille."
 "Shipfunk service couldn't create the package cards. The problem could be with the given parcels, or the service itself is down. See the limits and rules for creating parcels from here: *thelink*. If you think that the parcels are set correctly, try again later or send us a notice into our technical service: love@shipfunk.com","Shipfunkin palvelu ei pystynyt luomaan pakettikortteja. Ongelma voi liittyä annettuihin paketteihin tai palvelu voi olla poissa käytöstä. Jos uskot pakettien olevan asetettu oikein niin yritä uudestaan myöhemmin tai lähetä sähköpostia meidän tekniseen tukeemme: love@shipfunk.com"
+"Opening hours","Aukioloajat"
+"Additional info","Lisätiedot"

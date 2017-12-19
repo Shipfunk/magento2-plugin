@@ -14,7 +14,8 @@
             <strong id="block-shipfunk-option-heading"
                     role="heading"
                     aria-level="2"
-                    data-bind="i18n: shippingPoints ? 'Choose pickup location' : ''"></strong>
+                    data-bind="if: shippingPoints"
+                    translate="'Choose pickup location'"></strong>
         </div>
         <div class="block-content" aria-labelledby="block-shipfunk-option-heading">
             <div table data-bind="if: shippingPoints">
@@ -23,8 +24,20 @@
                                              'id': 's_method_' + pickup_id,
                                           },
                                           css: $parent.selectedPickupId() == pickup_id ? 'selected' : '',
-                                          click: $parent.selectPickupPoint,
-                                          text: pickup_name + ': ' + pickup_addr + ', ' + pickup_postal + ', ' + pickup_city + ', ' + pickup_country">
+                                          click: $parent.selectPickupPoint">
+                        <span class="points-text" data-bind="text: pickup_name + ': ' + pickup_addr + ', ' + pickup_postal + ', ' + pickup_city + ', ' + pickup_country"></span>
+                        <br />
+                        <span class="pickup_openinghours points-additional"  data-bind="if: ((typeof pickup_openinghours).localeCompare('undefined')) && pickup_openinghours">
+                            <span translate="'Opening hours'"></span>
+                            <span class="pickup_openinghours" data-bind="text: pickup_openinghours"></span>
+                            <span>.</span>
+                        </span>
+                        
+                        <span class="pickup_additional_info points-additional"  data-bind="if: ((typeof pickup_additional_info).localeCompare('undefined')) && pickup_additional_info">
+                            <span translate="'Additional info'"></span>
+                            <span data-bind="text: pickup_additional_info"></span>
+                            <span>.</span>
+                        </span>                        
                     </div>
                 </div>
             </div>
