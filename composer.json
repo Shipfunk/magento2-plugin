@@ -2,7 +2,7 @@
     "name": "nord/module-shipfunk",
     "description": "Shipfunk shipping method for Magento 2",
     "require": {
-        "php": "~5.6.0|7.0.2|~7.0.6",
+        "php": "~5.6.0|7.0.2|~7.0.6|~7.1.0",
         "magento/module-sales": "~100.0|~101.0"
     },
     "type": "magento2-module",
